@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToolBox — Kumpulan Tools Berguna</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --border: #2a2a3d;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --accent3: #f59e0b;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --success: #10b981;
+    --danger: #ef4444;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(124,58,237,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+  /* Header */
+  header {
+    padding: 40px 0 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -2px;
+  }
+
+  header p {
+    color: var(--muted);
+    margin-top: 8px;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Tool Grid */
+  .tool-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+    justify-content: center;
+  }
+
+  .tab-btn {
+    padding: 8px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .tab-btn:hover { border-color: var(--accent); color: var(--text); }
+  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Tool Panel */
+  .tool-panel { display: none; animation: fadeIn 0.3s ease; }
+  .tool-panel.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .panel-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 16px;
+  }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .panel-desc {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+  }
+
+  /* Inputs */
+  textarea, input[type="text"], input[type="number"], select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    padding: 12px 16px;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+  }
+
+  textarea:focus, input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  textarea { min-height: 120px; }
+
+  label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+  label:first-child { margin-top: 0; }
+
+  /* Buttons */
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #6d28d9; transform: translateY(-1px); }
+
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); }
+
+  .btn-cyan { background: var(--accent2); color: #000; }
+  .btn-cyan:hover { opacity: 0.9; }
+
+  .btn-group { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+  /* Output box */
+  .output-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin-top: 16px;
+    word-break: break-all;
+    min-height: 60px;
+    color: var(--accent2);
+    white-space: pre-wrap;
+    position: relative;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  .copy-btn.copied { color: var(--success); border-color: var(--success); }
+
+  /* Stats row */
+  .stats-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+
+  .stat-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
+
+  .stat-chip span { color: var(--accent3); font-weight: 700; }
+
+  /* Grid 2 cols */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Password strength */
+  .strength-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 12px;
+    overflow: hidden;
+  }
+  .strength-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s, background 0.3s;
+  }
+
+  /* Color picker */
+  .color-preview {
+    width: 100%;
+    height: 80px;
+    border-radius: 8px;
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    transition: background 0.3s;
+  }
+
+  input[type="color"] {
+    width: 60px; height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg);
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  .color-row { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+
+  /* Toggle */
+  .toggle-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 0.8rem; color: var(--muted); }
+  .toggle-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    border-top: 1px solid var(--border);
+    margin-top: 60px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin: 4px;
+  }
+
+  /* notification */
+  .notif {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--success);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    padding: 12px 20px;
+    border-radius: 8px;
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+  }
+  .notif.show { opacity: 1; transform: translateY(0); }
+
+  /* Range */
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    background: transparent;
+    margin: 8px 0;
+  }
+
+  /* Calculator Buttons */
+  .calc-btn {
+    padding: 16px 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  .calc-btn:hover { background: var(--border); transform: scale(1.04); }
+  .calc-btn:active { transform: scale(0.96); }
+  .calc-btn.calc-op { background: rgba(124,58,237,0.2); border-color: var(--accent); color: var(--accent2); }
+  .calc-btn.calc-op:hover { background: rgba(124,58,237,0.35); }
+  .calc-btn.calc-eq { background: var(--accent); border-color: var(--accent); color: #fff; font-size: 1.2rem; }
+  .calc-btn.calc-eq:hover { background: #6d28d9; }
+  .calc-btn.calc-fn { background: var(--surface); color: var(--muted); font-size: 0.8rem; }
+  .calc-btn.calc-fn:hover { color: var(--text); border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ TOOLBOX</h1>
+    <p>Kumpulan tools berguna — gratis, cepat, privat</p>
+  </header>
+
+  <div class="tool-tabs">
+    <button class="tab-btn active" onclick="switchTab('text')">📝 Text</button>
+    <button class="tab-btn" onclick="switchTab('password')">🔐 Password</button>
+    <button class="tab-btn" onclick="switchTab('base64')">🔄 Base64</button>
+    <button class="tab-btn" onclick="switchTab('json')">📦 JSON</button>
+    <button class="tab-btn" onclick="switchTab('color')">🎨 Warna</button>
+    <button class="tab-btn" onclick="switchTab('unit')">📏 Unit</button>
+    <button class="tab-btn" onclick="switchTab('hash')">🔑 Hash</button>
+    <button class="tab-btn" onclick="switchTab('time')">⏰ Waktu</button>
+    <button class="tab-btn" onclick="switchTab('calc')">🧮 Kalkulator</button>
+  </div>
+
+  <!-- TEXT TOOL -->
+  <div id="tab-text" class="tool-panel active">
+    <div class="panel-card">
+      <div class="panel-title">Text Analyzer & Converter</div>
+      <div class="panel-desc">// Hitung karakter, kata, ubah format teks</div>
+      <label>Masukkan Teks</label>
+      <textarea id="text-input" placeholder="Ketik atau paste teks di sini..." oninput="analyzeText()"></textarea>
+      <div class="stats-row" id="text-stats">
+        <div class="stat-chip">Karakter: <span id="stat-char">0</span></div>
+        <div class="stat-chip">Kata: <span id="stat-word">0</span></div>
+        <div class="stat-chip">Kalimat: <span id="stat-sent">0</span></div>
+        <div class="stat-chip">Baris: <span id="stat-line">0</span></div>
+        <div class="stat-chip">Karakter (no spasi): <span id="stat-nospace">0</span></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="convertCase('upper')">UPPERCASE</button>
+        <button class="btn btn-primary" onclick="convertCase('lower')">lowercase</button>
+        <button class="btn btn-primary" onclick="convertCase('title')">Title Case</button>
+        <button class="btn btn-primary" onclick="convertCase('sentence')">Sentence case</button>
+        <button class="btn btn-secondary" onclick="convertCase('reverse')">esreveR</button>
+        <button class="btn btn-secondary" onclick="convertCase('trim')">Trim Spasi</button>
+        <button class="btn btn-secondary" onclick="convertCase('slug')">slug-case</button>
+      </div>
+      <div class="output-box" id="text-output">— output akan muncul di sini —
+        <button class="copy-btn" onclick="copyOutput('text-output')">COPY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASSWORD TOOL -->
+  <div id="tab-password" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Password Generator</div>
+      <div class="panel-desc">// Buat password kuat secara kriptografis aman</div>
+      <label>Panjang Password: <span id="pass-len-display">16</span> karakter</label>
+      <input type="range" id="pass-length" min="6" max="128" value="16" oninput="updatePassLen()">
+      <div class="toggle-row"><input type="checkbox" id="pass-upper" checked onchange="generatePassword()"> Huruf Besar (A-Z)</div>
+      <div class="toggle-row"><input type="checkbox" id="pass-lower" checked onchange="generatePassword()"> Huruf Kecil (a-z)</div>
+      <div class="toggle-row"><input type="checkbox" id="pass-num" checked onchange="generatePassword()"> Angka (0-9)</div>
+      <div class="toggle-row"><input type="checkbox" id="pass-sym" onchange="generatePassword()"> Simbol (!@#$%...)</div>
+      <div class="toggle-row"><input type="checkbox" id="pass-noamb" onchange="generatePassword()"> Hindari karakter ambigu (0,O,l,1,I)</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="generatePassword()">🎲 Generate</button>
+        <button class="btn btn-secondary" onclick="generateMultiple()">Generate 5x</button>
+      </div>
+      <div class="output-box" id="pass-output">— klik generate —
+        <button class="copy-btn" onclick="copyOutput('pass-output')">COPY</button>
+      </div>
+      <div class="strength-bar"><div class="strength-fill" id="strength-fill" style="width:0%"></div></div>
+      <div style="margin-top:6px;font-size:0.75rem;color:var(--muted)" id="strength-label"></div>
+    </div>
+  </div>
+
+  <!-- BASE64 TOOL -->
+  <div id="tab-base64" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Base64 Encoder / Decoder</div>
+      <div class="panel-desc">// Encode & decode teks ke/dari Base64 dan URL encode</div>
+      <label>Input</label>
+      <textarea id="b64-input" placeholder="Masukkan teks atau Base64..."></textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="doBase64('encode')">Encode → Base64</button>
+        <button class="btn btn-cyan" onclick="doBase64('decode')">Decode ← Base64</button>
+        <button class="btn btn-secondary" onclick="doBase64('url-encode')">URL Encode</button>
+        <button class="btn btn-secondary" onclick="doBase64('url-decode')">URL Decode</button>
+      </div>
+      <div class="output-box" id="b64-output">— output —
+        <button class="copy-btn" onclick="copyOutput('b64-output')">COPY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSON TOOL -->
+  <div id="tab-json" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">JSON Formatter & Validator</div>
+      <div class="panel-desc">// Format, minify, dan validasi JSON</div>
+      <label>JSON Input</label>
+      <textarea id="json-input" placeholder='{"nama":"Budi","umur":25}' style="min-height:180px;"></textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="formatJSON('pretty')">✨ Format / Beautify</button>
+        <button class="btn btn-secondary" onclick="formatJSON('minify')">Minify</button>
+        <button class="btn btn-secondary" onclick="formatJSON('validate')">Validasi</button>
+        <button class="btn btn-secondary" onclick="formatJSON('keys')">Lihat Keys</button>
+      </div>
+      <div class="output-box" id="json-output" style="min-height:150px;">— output —
+        <button class="copy-btn" onclick="copyOutput('json-output')">COPY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COLOR TOOL -->
+  <div id="tab-color" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Color Converter</div>
+      <div class="panel-desc">// Konversi HEX, RGB, HSL</div>
+      <div class="color-row">
+        <input type="color" id="color-picker" value="#7c3aed" oninput="updateColorFromPicker()">
+        <div>
+          <label style="margin-top:0">HEX</label>
+          <input type="text" id="color-hex" value="#7c3aed" style="width:150px" oninput="updateColorFromHex()">
+        </div>
+      </div>
+      <div class="color-preview" id="color-preview" style="background:#7c3aed;"></div>
+      <div class="stats-row" id="color-values" style="margin-top:16px;">
+        <div class="stat-chip">HEX: <span id="cv-hex">#7c3aed</span></div>
+        <div class="stat-chip">RGB: <span id="cv-rgb">rgb(124,58,237)</span></div>
+        <div class="stat-chip">HSL: <span id="cv-hsl">hsl(262,84%,58%)</span></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="copyText(document.getElementById('cv-hex').innerText)">Copy HEX</button>
+        <button class="btn btn-secondary" onclick="copyText(document.getElementById('cv-rgb').innerText)">Copy RGB</button>
+        <button class="btn btn-secondary" onclick="copyText(document.getElementById('cv-hsl').innerText)">Copy HSL</button>
+        <button class="btn btn-cyan" onclick="randomColor()">🎲 Random Color</button>
+      </div>
+      <label style="margin-top:20px">Input RGB</label>
+      <div class="grid-2">
+        <div><label>R (0-255)</label><input type="number" id="rgb-r" min="0" max="255" value="124" oninput="updateFromRGB()"></div>
+        <div><label>G (0-255)</label><input type="number" id="rgb-g" min="0" max="255" value="58" oninput="updateFromRGB()"></div>
+      </div>
+      <div style="max-width:200px;margin-top:8px"><label>B (0-255)</label><input type="number" id="rgb-b" min="0" max="255" value="237" oninput="updateFromRGB()"></div>
+    </div>
+  </div>
+
+  <!-- UNIT TOOL -->
+  <div id="tab-unit" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Unit Converter</div>
+      <div class="panel-desc">// Konversi berbagai satuan ukuran</div>
+      <label>Kategori</label>
+      <select id="unit-category" onchange="updateUnitOptions()">
+        <option value="length">Panjang</option>
+        <option value="weight">Berat</option>
+        <option value="temp">Suhu</option>
+        <option value="area">Luas</option>
+        <option value="speed">Kecepatan</option>
+        <option value="data">Data Digital</option>
+      </select>
+      <div class="grid-2" style="margin-top:16px;">
+        <div>
+          <label>Dari</label>
+          <select id="unit-from"></select>
+          <input type="number" id="unit-value" value="1" oninput="convertUnit()" style="margin-top:8px;">
+        </div>
+        <div>
+          <label>Ke</label>
+          <select id="unit-to"></select>
+          <div class="output-box" id="unit-output" style="margin-top:8px;min-height:48px;">—</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary" onclick="swapUnits()" style="margin-top:12px;">⇄ Swap</button>
+    </div>
+  </div>
+
+  <!-- HASH TOOL -->
+  <div id="tab-hash" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Hash Generator</div>
+      <div class="panel-desc">// Generate MD5-like, CRC32, dan checksum sederhana (client-side)</div>
+      <label>Teks Input</label>
+      <textarea id="hash-input" placeholder="Masukkan teks untuk di-hash..."></textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="genHash('djb2')">DJB2 Hash</button>
+        <button class="btn btn-primary" onclick="genHash('fnv')">FNV-1a Hash</button>
+        <button class="btn btn-cyan" onclick="genHash('sha256web')">SHA-256 (Web API)</button>
+        <button class="btn btn-secondary" onclick="genHash('crc32')">CRC32</button>
+      </div>
+      <label>Output</label>
+      <div class="output-box" id="hash-output">— pilih algoritma dan klik generate —
+        <button class="copy-btn" onclick="copyOutput('hash-output')">COPY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIME TOOL -->
+  <div id="tab-time" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Timestamp & Waktu</div>
+      <div class="panel-desc">// Konversi Unix timestamp, hitung selisih waktu</div>
+      <div class="stats-row" id="live-time">
+        <div class="stat-chip">Unix Now: <span id="ts-now">—</span></div>
+        <div class="stat-chip">ISO: <span id="ts-iso">—</span></div>
+        <div class="stat-chip">WIB: <span id="ts-wib">—</span></div>
+      </div>
+      <label style="margin-top:20px">Unix Timestamp → Tanggal</label>
+      <input type="number" id="ts-input" placeholder="Contoh: 1700000000">
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="tsConvert()">Konversi</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('ts-input').value=Math.floor(Date.now()/1000)">Pakai Sekarang</button>
+      </div>
+      <div class="output-box" id="ts-output">—
+        <button class="copy-btn" onclick="copyOutput('ts-output')">COPY</button>
+      </div>
+      <label style="margin-top:20px">Hitung Selisih 2 Tanggal</label>
+      <div class="grid-2">
+        <div><label>Dari</label><input type="text" id="diff-from" placeholder="2024-01-01"></div>
+        <div><label>Sampai</label><input type="text" id="diff-to" placeholder="2025-01-01"></div>
+      </div>
+      <div class="btn-group"><button class="btn btn-cyan" onclick="calcDiff()">Hitung Selisih</button></div>
+      <div class="output-box" id="diff-output">—</div>
+    </div>
+  </div>
+
+  <!-- CALCULATOR TOOL -->
+  <div id="tab-calc" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Kalkulator</div>
+      <div class="panel-desc">// Kalkulator standar + saintifik + kalkulator persen & cicilan</div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+        <button class="btn btn-primary" id="mode-standard" onclick="setCalcMode('standard')">Standar</button>
+        <button class="btn btn-secondary" id="mode-scientific" onclick="setCalcMode('scientific')">Saintifik</button>
+        <button class="btn btn-secondary" id="mode-percent" onclick="setCalcMode('percent')">Persen & Diskon</button>
+        <button class="btn btn-secondary" id="mode-cicilan" onclick="setCalcMode('cicilan')">Cicilan / KPR</button>
+      </div>
+
+      <!-- STANDARD CALCULATOR -->
+      <div id="calc-standard">
+        <div id="calc-history" style="min-height:24px;font-size:0.75rem;color:var(--muted);text-align:right;margin-bottom:4px;"></div>
+        <div id="calc-display" style="
+          background:var(--bg);border:1px solid var(--border);border-radius:10px;
+          padding:16px 20px;font-size:2rem;text-align:right;font-family:'Space Mono',monospace;
+          color:var(--accent2);margin-bottom:12px;word-break:break-all;min-height:72px;
+          letter-spacing:-1px;">0</div>
+
+        <div id="calc-grid-standard" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+          <!-- Row 1 -->
+          <button class="calc-btn calc-fn" onclick="calcFn('clear')">AC</button>
+          <button class="calc-btn calc-fn" onclick="calcFn('sign')">+/-</button>
+          <button class="calc-btn calc-fn" onclick="calcFn('percent')">%</button>
+          <button class="calc-btn calc-op" onclick="calcOp('/')">÷</button>
+          <!-- Row 2 -->
+          <button class="calc-btn" onclick="calcNum('7')">7</button>
+          <button class="calc-btn" onclick="calcNum('8')">8</button>
+          <button class="calc-btn" onclick="calcNum('9')">9</button>
+          <button class="calc-btn calc-op" onclick="calcOp('*')">×</button>
+          <!-- Row 3 -->
+          <button class="calc-btn" onclick="calcNum('4')">4</button>
+          <button class="calc-btn" onclick="calcNum('5')">5</button>
+          <button class="calc-btn" onclick="calcNum('6')">6</button>
+          <button class="calc-btn calc-op" onclick="calcOp('-')">−</button>
+          <!-- Row 4 -->
+          <button class="calc-btn" onclick="calcNum('1')">1</button>
+          <button class="calc-btn" onclick="calcNum('2')">2</button>
+          <button class="calc-btn" onclick="calcNum('3')">3</button>
+          <button class="calc-btn calc-op" onclick="calcOp('+')">+</button>
+          <!-- Row 5 -->
+          <button class="calc-btn" onclick="calcNum('0')" style="grid-column:span 2;">0</button>
+          <button class="calc-btn" onclick="calcNum('.')">.</button>
+          <button class="calc-btn calc-eq" onclick="calcEquals()">=</button>
+          <!-- Backspace -->
+        </div>
+        <div style="margin-top:8px;text-align:right;">
+          <button class="calc-btn calc-fn" onclick="calcFn('back')" style="width:auto;padding:8px 20px;">⌫</button>
+        </div>
+      </div>
+
+      <!-- SCIENTIFIC CALCULATOR -->
+      <div id="calc-scientific" style="display:none;">
+        <div id="calc-history-sci" style="min-height:24px;font-size:0.75rem;color:var(--muted);text-align:right;margin-bottom:4px;"></div>
+        <div id="calc-display-sci" style="
+          background:var(--bg);border:1px solid var(--border);border-radius:10px;
+          padding:16px 20px;font-size:1.8rem;text-align:right;font-family:'Space Mono',monospace;
+          color:var(--accent2);margin-bottom:12px;word-break:break-all;min-height:72px;">0</div>
+
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
+          <button class="calc-btn calc-fn" onclick="sciFunc('sin')">sin</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('cos')">cos</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('tan')">tan</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('log')">log</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('ln')">ln</button>
+
+          <button class="calc-btn calc-fn" onclick="sciFunc('sqrt')">√</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('pow2')">x²</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('pow3')">x³</button>
+          <button class="calc-btn calc-fn" onclick="sciOp('**')">xⁿ</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('inv')">1/x</button>
+
+          <button class="calc-btn calc-fn" onclick="sciFunc('pi')">π</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('e')">e</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('abs')">|x|</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('fact')">n!</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('clear')">AC</button>
+
+          <button class="calc-btn" onclick="sciNum('7')">7</button>
+          <button class="calc-btn" onclick="sciNum('8')">8</button>
+          <button class="calc-btn" onclick="sciNum('9')">9</button>
+          <button class="calc-btn calc-op" onclick="sciOp('/')">÷</button>
+          <button class="calc-btn calc-op" onclick="sciOp('*')">×</button>
+
+          <button class="calc-btn" onclick="sciNum('4')">4</button>
+          <button class="calc-btn" onclick="sciNum('5')">5</button>
+          <button class="calc-btn" onclick="sciNum('6')">6</button>
+          <button class="calc-btn calc-op" onclick="sciOp('-')">−</button>
+          <button class="calc-btn calc-op" onclick="sciOp('+')">+</button>
+
+          <button class="calc-btn" onclick="sciNum('1')">1</button>
+          <button class="calc-btn" onclick="sciNum('2')">2</button>
+          <button class="calc-btn" onclick="sciNum('3')">3</button>
+          <button class="calc-btn" onclick="sciNum('0')">0</button>
+          <button class="calc-btn" onclick="sciNum('.')">.</button>
+
+          <button class="calc-btn calc-fn" onclick="sciFunc('back')">⌫</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('sign')">+/-</button>
+          <button class="calc-btn calc-fn" onclick="sciFunc('percent')">%</button>
+          <button class="calc-btn calc-eq" onclick="sciEquals()" style="grid-column:span 2;">=</button>
+        </div>
+      </div>
+
+      <!-- PERCENT & DISKON CALCULATOR -->
+      <div id="calc-percent" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:20px;">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:16px;color:var(--accent2)">Hitung Diskon</div>
+            <label>Harga Asli (Rp)</label>
+            <input type="number" id="disc-price" placeholder="100000" oninput="calcDiscount()">
+            <label>Diskon (%)</label>
+            <input type="number" id="disc-pct" placeholder="20" oninput="calcDiscount()">
+            <div class="output-box" id="disc-out" style="margin-top:12px;">—</div>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:20px;">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:16px;color:var(--accent3)">Hitung Persen</div>
+            <label>Berapa % dari</label>
+            <input type="number" id="pct-of" placeholder="25">
+            <label>Dari angka</label>
+            <input type="number" id="pct-from" placeholder="200" oninput="calcPercent()">
+            <div class="output-box" id="pct-out" style="margin-top:12px;">—</div>
+          </div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:20px;margin-top:16px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:16px;color:var(--success)">Persentase Perubahan</div>
+          <div class="grid-2">
+            <div><label>Nilai Awal</label><input type="number" id="chg-from" placeholder="80" oninput="calcChange()"></div>
+            <div><label>Nilai Akhir</label><input type="number" id="chg-to" placeholder="100" oninput="calcChange()"></div>
+          </div>
+          <div class="output-box" id="chg-out" style="margin-top:12px;">—</div>
+        </div>
+      </div>
+
+      <!-- CICILAN / KPR CALCULATOR -->
+      <div id="calc-cicilan" style="display:none;">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:24px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:4px;font-size:1.1rem;">Kalkulator Cicilan / KPR</div>
+          <div style="color:var(--muted);font-size:0.75rem;margin-bottom:20px;">Hitung cicilan dengan bunga anuitas (flat & efektif)</div>
+          <div class="grid-2">
+            <div>
+              <label>Total Pinjaman (Rp)</label>
+              <input type="number" id="loan-amount" placeholder="500000000" oninput="calcLoan()">
+              <label>Bunga per Tahun (%)</label>
+              <input type="number" id="loan-rate" placeholder="7.5" step="0.1" oninput="calcLoan()">
+            </div>
+            <div>
+              <label>Tenor (Tahun)</label>
+              <input type="number" id="loan-year" placeholder="15" oninput="calcLoan()">
+              <label>Uang Muka / DP (Rp)</label>
+              <input type="number" id="loan-dp" placeholder="0" oninput="calcLoan()">
+            </div>
+          </div>
+          <div class="output-box" id="loan-out" style="margin-top:16px;min-height:120px;">— isi form di atas untuk melihat simulasi cicilan —</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <p>⚡ TOOLBOX — Semua proses dilakukan di browser, tidak ada data yang dikirim ke server</p>
+    <div style="margin-top:12px;">
+      <span class="badge">🔒 100% Client-Side</span>
+      <span class="badge">⚡ Tanpa Login</span>
+      <span class="badge">🆓 Gratis</span>
+      <span class="badge">🔒 Privat</span>
+    </div>
+  </div>
+</footer>
+
+<div class="notif" id="notif">✓ Disalin!</div>
+
+<script>
+// ===== TAB SWITCHER =====
+function switchTab(name) {
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===== NOTIFICATIONS =====
+function showNotif(msg = '✓ Disalin!') {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2000);
+}
+
+function copyText(t) {
+  navigator.clipboard.writeText(t).then(() => showNotif());
+}
+
+function copyOutput(id) {
+  const el = document.getElementById(id);
+  const text = el.innerText.replace(/COPY$/, '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.querySelector('.copy-btn');
+    if (btn) { btn.textContent = 'COPIED!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000); }
+    showNotif();
+  });
+}
+
+// ===== TEXT TOOL =====
+function analyzeText() {
+  const t = document.getElementById('text-input').value;
+  document.getElementById('stat-char').textContent = t.length;
+  document.getElementById('stat-word').textContent = t.trim() ? t.trim().split(/\s+/).length : 0;
+  document.getElementById('stat-sent').textContent = t.trim() ? (t.match(/[.!?]+/g) || []).length : 0;
+  document.getElementById('stat-line').textContent = t ? t.split('\n').length : 0;
+  document.getElementById('stat-nospace').textContent = t.replace(/\s/g, '').length;
+}
+
+function convertCase(type) {
+  const t = document.getElementById('text-input').value;
+  let out = '';
+  switch(type) {
+    case 'upper': out = t.toUpperCase(); break;
+    case 'lower': out = t.toLowerCase(); break;
+    case 'title': out = t.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()); break;
+    case 'sentence': out = t.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, c => c.toUpperCase()); break;
+    case 'reverse': out = t.split('').reverse().join(''); break;
+    case 'trim': out = t.replace(/\s+/g, ' ').trim(); break;
+    case 'slug': out = t.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_]+/g, '-').replace(/^-+|-+$/g, ''); break;
+  }
+  const box = document.getElementById('text-output');
+  box.childNodes[0].textContent = out || '(kosong)';
+}
+
+// ===== PASSWORD TOOL =====
+function updatePassLen() {
+  const v = document.getElementById('pass-length').value;
+  document.getElementById('pass-len-display').textContent = v;
+  generatePassword();
+}
+
+function generatePassword() {
+  const len = parseInt(document.getElementById('pass-length').value);
+  const upper = document.getElementById('pass-upper').checked;
+  const lower = document.getElementById('pass-lower').checked;
+  const num = document.getElementById('pass-num').checked;
+  const sym = document.getElementById('pass-sym').checked;
+  const noAmb = document.getElementById('pass-noamb').checked;
+
+  let chars = '';
+  if (upper) chars += noAmb ? 'ABCDEFGHJKLMNPQRSTUVWXYZ' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if (lower) chars += noAmb ? 'abcdefghjkmnpqrstuvwxyz' : 'abcdefghijklmnopqrstuvwxyz';
+  if (num) chars += noAmb ? '23456789' : '0123456789';
+  if (sym) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+  if (!chars) { document.getElementById('pass-output').childNodes[0].textContent = '⚠ Pilih minimal satu opsi'; return; }
+
+  const arr = new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  let pass = Array.from(arr).map(v => chars[v % chars.length]).join('');
+  document.getElementById('pass-output').childNodes[0].textContent = pass;
+  updateStrength(pass);
+}
+
+function generateMultiple() {
+  const len = parseInt(document.getElementById('pass-length').value);
+  const passes = [];
+  for (let i = 0; i < 5; i++) { generatePassword(); passes.push(document.getElementById('pass-output').childNodes[0].textContent); }
+  document.getElementById('pass-output').childNodes[0].textContent = passes.join('\n');
+}
+
+function updateStrength(pass) {
+  let score = 0;
+  if (pass.length >= 8) score++;
+  if (pass.length >= 12) score++;
+  if (pass.length >= 20) score++;
+  if (/[A-Z]/.test(pass)) score++;
+  if (/[a-z]/.test(pass)) score++;
+  if (/[0-9]/.test(pass)) score++;
+  if (/[^A-Za-z0-9]/.test(pass)) score++;
+
+  const pct = Math.min(100, (score / 7) * 100);
+  const fill = document.getElementById('strength-fill');
+  const label = document.getElementById('strength-label');
+  fill.style.width = pct + '%';
+
+  if (pct < 30) { fill.style.background = '#ef4444'; label.textContent = 'Lemah'; }
+  else if (pct < 60) { fill.style.background = '#f59e0b'; label.textContent = 'Sedang'; }
+  else if (pct < 85) { fill.style.background = '#10b981'; label.textContent = 'Kuat'; }
+  else { fill.style.background = '#06b6d4'; label.textContent = '⚡ Sangat Kuat'; }
+}
+
+// ===== BASE64 TOOL =====
+function doBase64(type) {
+  const input = document.getElementById('b64-input').value;
+  let out = '';
+  try {
+    if (type === 'encode') out = btoa(unescape(encodeURIComponent(input)));
+    else if (type === 'decode') out = decodeURIComponent(escape(atob(input)));
+    else if (type === 'url-encode') out = encodeURIComponent(input);
+    else if (type === 'url-decode') out = decodeURIComponent(input);
+  } catch(e) { out = '⚠ Error: ' + e.message; }
+  document.getElementById('b64-output').childNodes[0].textContent = out;
+}
+
+// ===== JSON TOOL =====
+function formatJSON(type) {
+  const input = document.getElementById('json-input').value;
+  const box = document.getElementById('json-output');
+  try {
+    const parsed = JSON.parse(input);
+    if (type === 'pretty') box.childNodes[0].textContent = JSON.stringify(parsed, null, 2);
+    else if (type === 'minify') box.childNodes[0].textContent = JSON.stringify(parsed);
+    else if (type === 'validate') box.childNodes[0].textContent = '✅ JSON Valid!\nTipe: ' + (Array.isArray(parsed) ? 'Array' : typeof parsed) + '\nJumlah keys: ' + (typeof parsed === 'object' ? Object.keys(parsed).length : 'N/A');
+    else if (type === 'keys') {
+      const keys = Object.keys(parsed);
+      box.childNodes[0].textContent = 'Keys (' + keys.length + '):\n' + keys.map((k,i) => (i+1)+'. '+k+' ('+typeof parsed[k]+')').join('\n');
+    }
+  } catch(e) {
+    box.childNodes[0].textContent = '❌ JSON tidak valid:\n' + e.message;
+  }
+}
+
+// ===== COLOR TOOL =====
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return {r,g,b};
+}
+function rgbToHex(r,g,b) { return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join(''); }
+function rgbToHsl(r,g,b) {
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){h=s=0;}else{
+    const d=max-min; s=l>0.5?d/(2-max-min):d/(max+min);
+    switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;}
+    h/=6;
+  }
+  return {h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)};
+}
+
+function updateColorDisplay(hex) {
+  document.getElementById('color-preview').style.background = hex;
+  document.getElementById('color-hex').value = hex;
+  document.getElementById('color-picker').value = hex;
+  const {r,g,b} = hexToRgb(hex);
+  const {h,s,l} = rgbToHsl(r,g,b);
+  document.getElementById('cv-hex').textContent = hex;
+  document.getElementById('cv-rgb').textContent = `rgb(${r},${g},${b})`;
+  document.getElementById('cv-hsl').textContent = `hsl(${h},${s}%,${l}%)`;
+  document.getElementById('rgb-r').value = r;
+  document.getElementById('rgb-g').value = g;
+  document.getElementById('rgb-b').value = b;
+}
+
+function updateColorFromPicker() { updateColorDisplay(document.getElementById('color-picker').value); }
+function updateColorFromHex() {
+  let hex = document.getElementById('color-hex').value;
+  if (/^#[0-9A-Fa-f]{6}$/.test(hex)) updateColorDisplay(hex);
+}
+function updateFromRGB() {
+  const r = parseInt(document.getElementById('rgb-r').value)||0;
+  const g = parseInt(document.getElementById('rgb-g').value)||0;
+  const b = parseInt(document.getElementById('rgb-b').value)||0;
+  updateColorDisplay(rgbToHex(Math.min(255,r), Math.min(255,g), Math.min(255,b)));
+}
+function randomColor() {
+  const hex = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6,'0');
+  updateColorDisplay(hex);
+}
+
+// ===== UNIT CONVERTER =====
+const unitData = {
+  length: {
+    units: ['mm','cm','m','km','inch','feet','yard','mile'],
+    toBase: {'mm':0.001,'cm':0.01,'m':1,'km':1000,'inch':0.0254,'feet':0.3048,'yard':0.9144,'mile':1609.34},
+  },
+  weight: {
+    units: ['mg','g','kg','ton','oz','lb'],
+    toBase: {'mg':0.000001,'g':0.001,'kg':1,'ton':1000,'oz':0.0283495,'lb':0.453592},
+  },
+  temp: {
+    units: ['Celsius','Fahrenheit','Kelvin'],
+    toBase: null,
+  },
+  area: {
+    units: ['mm²','cm²','m²','km²','hectare','acre','ft²'],
+    toBase: {'mm²':0.000001,'cm²':0.0001,'m²':1,'km²':1000000,'hectare':10000,'acre':4046.86,'ft²':0.092903},
+  },
+  speed: {
+    units: ['m/s','km/h','mph','knot'],
+    toBase: {'m/s':1,'km/h':0.277778,'mph':0.44704,'knot':0.514444},
+  },
+  data: {
+    units: ['bit','byte','KB','MB','GB','TB'],
+    toBase: {'bit':0.125,'byte':1,'KB':1024,'MB':1048576,'GB':1073741824,'TB':1099511627776},
+  },
+};
+
+function updateUnitOptions() {
+  const cat = document.getElementById('unit-category').value;
+  const units = unitData[cat].units;
+  const from = document.getElementById('unit-from');
+  const to = document.getElementById('unit-to');
+  from.innerHTML = units.map(u => `<option>${u}</option>`).join('');
+  to.innerHTML = units.map((u,i) => `<option${i===1?' selected':''}>${u}</option>`).join('');
+  convertUnit();
+}
+
+function convertUnit() {
+  const cat = document.getElementById('unit-category').value;
+  const val = parseFloat(document.getElementById('unit-value').value);
+  const from = document.getElementById('unit-from').value;
+  const to = document.getElementById('unit-to').value;
+  let result;
+
+  if (cat === 'temp') {
+    let celsius;
+    if (from === 'Celsius') celsius = val;
+    else if (from === 'Fahrenheit') celsius = (val - 32) * 5/9;
+    else celsius = val - 273.15;
+    if (to === 'Celsius') result = celsius;
+    else if (to === 'Fahrenheit') result = celsius * 9/5 + 32;
+    else result = celsius + 273.15;
+  } else {
+    const base = val * unitData[cat].toBase[from];
+    result = base / unitData[cat].toBase[to];
+  }
+
+  document.getElementById('unit-output').textContent = isNaN(result) ? '—' : (Number.isInteger(result) ? result : result.toFixed(6).replace(/\.?0+$/, '')) + ' ' + to;
+}
+
+function swapUnits() {
+  const from = document.getElementById('unit-from');
+  const to = document.getElementById('unit-to');
+  const temp = from.value; from.value = to.value; to.value = temp;
+  convertUnit();
+}
+
+// ===== HASH TOOL =====
+function djb2(str) {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h) + str.charCodeAt(i);
+  return (h >>> 0).toString(16).padStart(8,'0');
+}
+function fnv1a(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = (h * 16777619) >>> 0; }
+  return h.toString(16).padStart(8,'0');
+}
+function crc32(str) {
+  let crcTable = [];
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+    crcTable[n] = c;
+  }
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < str.length; i++) crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+  return ((crc ^ 0xFFFFFFFF) >>> 0).toString(16).padStart(8,'0');
+}
+
+async function genHash(type) {
+  const input = document.getElementById('hash-input').value;
+  const box = document.getElementById('hash-output');
+  let out = '';
+  if (type === 'djb2') out = 'DJB2:  ' + djb2(input);
+  else if (type === 'fnv') out = 'FNV-1a: ' + fnv1a(input);
+  else if (type === 'crc32') out = 'CRC32: ' + crc32(input);
+  else if (type === 'sha256web') {
+    try {
+      const enc = new TextEncoder().encode(input);
+      const hashBuf = await crypto.subtle.digest('SHA-256', enc);
+      const hashArr = Array.from(new Uint8Array(hashBuf));
+      out = 'SHA-256:\n' + hashArr.map(b => b.toString(16).padStart(2,'0')).join('');
+    } catch(e) { out = '⚠ Error: ' + e.message; }
+  }
+  box.childNodes[0].textContent = out;
+}
+
+// ===== TIME TOOL =====
+function updateLiveTime() {
+  const now = new Date();
+  document.getElementById('ts-now').textContent = Math.floor(now.getTime()/1000);
+  document.getElementById('ts-iso').textContent = now.toISOString().slice(0,19);
+  document.getElementById('ts-wib').textContent = now.toLocaleString('id-ID', {timeZone:'Asia/Jakarta'});
+}
+setInterval(updateLiveTime, 1000);
+updateLiveTime();
+
+function tsConvert() {
+  const ts = parseInt(document.getElementById('ts-input').value);
+  if (isNaN(ts)) { document.getElementById('ts-output').childNodes[0].textContent = '⚠ Masukkan angka valid'; return; }
+  const d = new Date(ts * 1000);
+  const out = [
+    'UTC:      ' + d.toUTCString(),
+    'ISO:      ' + d.toISOString(),
+    'WIB:      ' + d.toLocaleString('id-ID', {timeZone:'Asia/Jakarta'}),
+    'WITA:     ' + d.toLocaleString('id-ID', {timeZone:'Asia/Makassar'}),
+    'WIT:      ' + d.toLocaleString('id-ID', {timeZone:'Asia/Jayapura'}),
+  ].join('\n');
+  document.getElementById('ts-output').childNodes[0].textContent = out;
+}
+
+function calcDiff() {
+  const a = new Date(document.getElementById('diff-from').value);
+  const b = new Date(document.getElementById('diff-to').value);
+  if (isNaN(a) || isNaN(b)) { document.getElementById('diff-output').textContent = '⚠ Format tanggal: YYYY-MM-DD'; return; }
+  const ms = Math.abs(b - a);
+  const days = Math.floor(ms / 86400000);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30.4375);
+  const years = Math.floor(days / 365.25);
+  document.getElementById('diff-output').textContent = 
+    `${days} hari\n${weeks} minggu\n${months} bulan (~)\n${years} tahun (~)`;
+}
+
+// INIT
+updateUnitOptions();
+updateColorDisplay('#7c3aed');
+
+// ===== CALCULATOR =====
+let calcState = { display: '0', prev: null, op: null, newNum: true, history: '' };
+let sciState = { display: '0', prev: null, op: null, newNum: true, history: '' };
+let currentCalcMode = 'standard';
+
+function setCalcMode(mode) {
+  currentCalcMode = mode;
+  document.getElementById('calc-standard').style.display = mode === 'standard' ? 'block' : 'none';
+  document.getElementById('calc-scientific').style.display = mode === 'scientific' ? 'block' : 'none';
+  document.getElementById('calc-percent').style.display = mode === 'percent' ? 'block' : 'none';
+  document.getElementById('calc-cicilan').style.display = mode === 'cicilan' ? 'block' : 'none';
+  document.querySelectorAll('[id^="mode-"]').forEach(b => b.className = 'btn btn-secondary');
+  document.getElementById('mode-' + mode).className = 'btn btn-primary';
+}
+
+function updateCalcDisplay() {
+  const d = document.getElementById('calc-display');
+  const h = document.getElementById('calc-history');
+  let val = calcState.display;
+  // format large numbers
+  if (!isNaN(val) && val !== '' && !val.includes('.')) {
+    const n = parseFloat(val);
+    if (Math.abs(n) >= 1e15) val = n.toExponential(4);
+    else val = n.toLocaleString('id-ID', {maximumFractionDigits: 10});
+  }
+  d.textContent = val;
+  h.textContent = calcState.history;
+  // Adjust font size
+  const len = val.length;
+  d.style.fontSize = len > 14 ? '1.2rem' : len > 10 ? '1.6rem' : '2rem';
+}
+
+function calcNum(n) {
+  if (calcState.newNum) { calcState.display = n === '.' ? '0.' : n; calcState.newNum = false; }
+  else if (n === '.' && calcState.display.includes('.')) return;
+  else calcState.display += n;
+  updateCalcDisplay();
+}
+
+function calcOp(op) {
+  if (calcState.op && !calcState.newNum) calcEquals(true);
+  calcState.prev = parseFloat(calcState.display.replace(/\./g, '').replace(',', '.'));
+  // re-parse properly
+  calcState.prev = parseFloat(calcState.display.replace(/[^0-9.-]/g, ''));
+  calcState.op = op;
+  calcState.history = calcState.display + ' ' + {'+':'+','-':'−','*':'×','/':'÷','**':'^'}[op];
+  calcState.newNum = true;
+  updateCalcDisplay();
+}
+
+function calcEquals(chain = false) {
+  if (calcState.op === null) return;
+  const a = calcState.prev;
+  const b = parseFloat(calcState.display.replace(/[^0-9.-]/g, ''));
+  let result;
+  switch(calcState.op) {
+    case '+': result = a + b; break;
+    case '-': result = a - b; break;
+    case '*': result = a * b; break;
+    case '/': result = b === 0 ? 'Error: ÷0' : a / b; break;
+    case '**': result = Math.pow(a, b); break;
+    default: result = b;
+  }
+  if (!chain) calcState.history = calcState.history + ' ' + calcState.display + ' =';
+  calcState.display = typeof result === 'string' ? result : String(parseFloat(result.toFixed(10)));
+  if (!chain) { calcState.op = null; calcState.prev = null; }
+  calcState.newNum = true;
+  updateCalcDisplay();
+}
+
+function calcFn(fn) {
+  const cur = parseFloat(calcState.display.replace(/[^0-9.-]/g, '')) || 0;
+  if (fn === 'clear') { calcState = { display: '0', prev: null, op: null, newNum: true, history: '' }; }
+  else if (fn === 'sign') { calcState.display = String(-cur); calcState.newNum = false; }
+  else if (fn === 'percent') { calcState.display = String(cur / 100); calcState.newNum = false; }
+  else if (fn === 'back') {
+    if (calcState.display.length > 1) calcState.display = calcState.display.slice(0, -1);
+    else calcState.display = '0';
+    calcState.newNum = false;
+  }
+  updateCalcDisplay();
+}
+
+// SCIENTIFIC
+function updateSciDisplay() {
+  const d = document.getElementById('calc-display-sci');
+  const h = document.getElementById('calc-history-sci');
+  let val = sciState.display;
+  d.textContent = val;
+  h.textContent = sciState.history;
+  const len = val.length;
+  d.style.fontSize = len > 14 ? '1.1rem' : len > 10 ? '1.4rem' : '1.8rem';
+}
+
+function sciNum(n) {
+  if (sciState.newNum) { sciState.display = n === '.' ? '0.' : n; sciState.newNum = false; }
+  else if (n === '.' && sciState.display.includes('.')) return;
+  else sciState.display += n;
+  updateSciDisplay();
+}
+
+function sciOp(op) {
+  if (sciState.op && !sciState.newNum) sciEquals(true);
+  sciState.prev = parseFloat(sciState.display);
+  sciState.op = op;
+  sciState.history = sciState.display + ' ' + {'+':'+','-':'−','*':'×','/':'÷','**':'^'}[op];
+  sciState.newNum = true;
+  updateSciDisplay();
+}
+
+function sciEquals(chain = false) {
+  if (sciState.op === null) return;
+  const a = sciState.prev;
+  const b = parseFloat(sciState.display);
+  let result;
+  switch(sciState.op) {
+    case '+': result = a + b; break;
+    case '-': result = a - b; break;
+    case '*': result = a * b; break;
+    case '/': result = b === 0 ? 'Error' : a / b; break;
+    case '**': result = Math.pow(a, b); break;
+    default: result = b;
+  }
+  if (!chain) sciState.history = sciState.history + ' ' + sciState.display + ' =';
+  sciState.display = typeof result === 'string' ? result : String(parseFloat(result.toPrecision(12)));
+  if (!chain) { sciState.op = null; sciState.prev = null; }
+  sciState.newNum = true;
+  updateSciDisplay();
+}
+
+function factorial(n) {
+  if (n < 0) return NaN;
+  if (n === 0 || n === 1) return 1;
+  if (n > 170) return Infinity;
+  let r = 1; for (let i = 2; i <= n; i++) r *= i; return r;
+}
+
+function sciFunc(fn) {
+  const cur = parseFloat(sciState.display) || 0;
+  let result;
+  switch(fn) {
+    case 'sin': result = Math.sin(cur * Math.PI / 180); break;
+    case 'cos': result = Math.cos(cur * Math.PI / 180); break;
+    case 'tan': result = Math.tan(cur * Math.PI / 180); break;
+    case 'log': result = cur <= 0 ? 'Error' : Math.log10(cur); break;
+    case 'ln': result = cur <= 0 ? 'Error' : Math.log(cur); break;
+    case 'sqrt': result = cur < 0 ? 'Error' : Math.sqrt(cur); break;
+    case 'pow2': result = Math.pow(cur, 2); break;
+    case 'pow3': result = Math.pow(cur, 3); break;
+    case 'inv': result = cur === 0 ? 'Error' : 1 / cur; break;
+    case 'abs': result = Math.abs(cur); break;
+    case 'fact': result = factorial(Math.round(cur)); break;
+    case 'pi': sciState.display = String(Math.PI); sciState.newNum = true; updateSciDisplay(); return;
+    case 'e': sciState.display = String(Math.E); sciState.newNum = true; updateSciDisplay(); return;
+    case 'sign': result = -cur; break;
+    case 'percent': result = cur / 100; break;
+    case 'back': sciState.display = sciState.display.length > 1 ? sciState.display.slice(0,-1) : '0'; sciState.newNum = false; updateSciDisplay(); return;
+    case 'clear': sciState = { display: '0', prev: null, op: null, newNum: true, history: '' }; updateSciDisplay(); return;
+  }
+  sciState.display = typeof result === 'string' ? result : String(parseFloat(result.toPrecision(12)));
+  sciState.newNum = true;
+  updateSciDisplay();
+}
+
+// DISKON & PERSEN
+function calcDiscount() {
+  const price = parseFloat(document.getElementById('disc-price').value) || 0;
+  const pct = parseFloat(document.getElementById('disc-pct').value) || 0;
+  const save = price * pct / 100;
+  const final = price - save;
+  document.getElementById('disc-out').textContent =
+    `Hemat: Rp ${save.toLocaleString('id-ID')}\nHarga Akhir: Rp ${final.toLocaleString('id-ID')}\nAnda bayar ${100-pct}% dari harga asli`;
+}
+
+function calcPercent() {
+  const of = parseFloat(document.getElementById('pct-of').value) || 0;
+  const from = parseFloat(document.getElementById('pct-from').value) || 1;
+  const result = (of / 100) * from;
+  document.getElementById('pct-out').textContent = `${of}% dari ${from.toLocaleString('id-ID')} = ${result.toLocaleString('id-ID')}`;
+}
+
+function calcChange() {
+  const from = parseFloat(document.getElementById('chg-from').value) || 0;
+  const to = parseFloat(document.getElementById('chg-to').value) || 0;
+  if (from === 0) { document.getElementById('chg-out').textContent = '⚠ Nilai awal tidak boleh 0'; return; }
+  const pct = ((to - from) / Math.abs(from)) * 100;
+  const label = pct >= 0 ? '📈 Naik' : '📉 Turun';
+  document.getElementById('chg-out').textContent = `${label} ${Math.abs(pct).toFixed(2)}%\n${from.toLocaleString('id-ID')} → ${to.toLocaleString('id-ID')}`;
+}
+
+// CICILAN
+function calcLoan() {
+  const total = parseFloat(document.getElementById('loan-amount').value) || 0;
+  const dp = parseFloat(document.getElementById('loan-dp').value) || 0;
+  const rateYear = parseFloat(document.getElementById('loan-rate').value) || 0;
+  const years = parseFloat(document.getElementById('loan-year').value) || 0;
+
+  const pokok = total - dp;
+  const rateMonth = (rateYear / 100) / 12;
+  const n = years * 12;
+
+  if (pokok <= 0 || n <= 0 || rateYear <= 0) {
+    document.getElementById('loan-out').textContent = '— isi semua kolom —';
+    return;
+  }
+
+  // Anuitas (efektif)
+  const cicilan = pokok * (rateMonth * Math.pow(1 + rateMonth, n)) / (Math.pow(1 + rateMonth, n) - 1);
+  const totalBayar = cicilan * n;
+  const totalBunga = totalBayar - pokok;
+
+  // Flat
+  const cicilanFlat = pokok / n + (pokok * rateYear / 100 / 12);
+  const totalFlat = cicilanFlat * n;
+
+  document.getElementById('loan-out').textContent =
+    `━━ METODE ANUITAS (Efektif) ━━\n` +
+    `Cicilan/bulan:  Rp ${Math.round(cicilan).toLocaleString('id-ID')}\n` +
+    `Total bayar:    Rp ${Math.round(totalBayar).toLocaleString('id-ID')}\n` +
+    `Total bunga:    Rp ${Math.round(totalBunga).toLocaleString('id-ID')}\n\n` +
+    `━━ METODE FLAT ━━\n` +
+    `Cicilan/bulan:  Rp ${Math.round(cicilanFlat).toLocaleString('id-ID')}\n` +
+    `Total bayar:    Rp ${Math.round(totalFlat).toLocaleString('id-ID')}\n\n` +
+    `Tenor: ${years} tahun (${n} bulan) | DP: Rp ${dp.toLocaleString('id-ID')}`;
+}
+
+// Keyboard support for calculator
+document.addEventListener('keydown', e => {
+  if (currentCalcMode === 'standard') {
+    if ('0123456789.'.includes(e.key)) calcNum(e.key);
+    else if (e.key === '+') calcOp('+');
+    else if (e.key === '-') calcOp('-');
+    else if (e.key === '*') calcOp('*');
+    else if (e.key === '/') { e.preventDefault(); calcOp('/'); }
+    else if (e.key === 'Enter' || e.key === '=') calcEquals();
+    else if (e.key === 'Backspace') calcFn('back');
+    else if (e.key === 'Escape') calcFn('clear');
+  }
+});
+</script>
+</body>
+</html>

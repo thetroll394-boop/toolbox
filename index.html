@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToolBox — Adam yang Ganteng</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Noto+Sans:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+Arabic:wght@400;700&family=Noto+Sans+Thai:wght@400;700&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c28;--border:#2a2a3d;--accent:#7c3aed;--accent2:#06b6d4;--accent3:#f59e0b;--text:#e8e8f0;--muted:#6b6b8a;--success:#10b981;--danger:#ef4444;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,58,237,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.05) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.container{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 20px;}
+header{padding:40px 0 20px;text-align:center;border-bottom:1px solid var(--border);margin-bottom:32px;}
+header h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,6vw,3.5rem);font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-2px;}
+header p{color:var(--muted);margin-top:8px;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;}
+.tool-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px;justify-content:center;}
+.tab-btn{padding:7px 13px;background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:0.7rem;cursor:pointer;border-radius:4px;transition:all 0.2s;text-transform:uppercase;letter-spacing:1px;}
+.tab-btn:hover{border-color:var(--accent);color:var(--text);}
+.tab-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.tool-panel{display:none;animation:fadeIn 0.3s ease;}
+.tool-panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.panel-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:16px;}
+.panel-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:4px;}
+.panel-desc{color:var(--muted);font-size:0.75rem;margin-bottom:20px;letter-spacing:1px;}
+textarea,input[type="text"],input[type="number"],select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Space Mono',monospace;font-size:0.82rem;padding:10px 14px;border-radius:8px;outline:none;transition:border-color 0.2s;resize:vertical;}
+textarea:focus,input[type="text"]:focus,input[type="number"]:focus,select:focus{border-color:var(--accent);}
+textarea{min-height:100px;}
+label{display:block;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;margin-top:14px;}
+label:first-child{margin-top:0;}
+.btn{padding:9px 18px;border:none;border-radius:6px;font-family:'Space Mono',monospace;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:1px;}
+.btn-primary{background:var(--accent);color:#fff;}.btn-primary:hover{background:#6d28d9;transform:translateY(-1px);}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}.btn-secondary:hover{border-color:var(--accent);}
+.btn-cyan{background:var(--accent2);color:#000;}.btn-cyan:hover{opacity:0.9;}
+.btn-group{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;}
+.output-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;font-size:0.82rem;line-height:1.7;margin-top:14px;word-break:break-all;min-height:56px;color:var(--accent2);white-space:pre-wrap;position:relative;}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:0.65rem;padding:3px 9px;border-radius:4px;cursor:pointer;transition:all 0.2s;}
+.copy-btn:hover{color:var(--text);border-color:var(--accent);}
+.copy-btn.copied{color:var(--success);border-color:var(--success);}
+.stats-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.stat-chip{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:0.72rem;}
+.stat-chip span{color:var(--accent3);font-weight:700;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:600px){.grid-2{grid-template-columns:1fr;}}
+.strength-bar{height:4px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden;}
+.strength-fill{height:100%;border-radius:2px;transition:width 0.3s,background 0.3s;}
+input[type="color"]{width:54px;height:38px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;padding:2px;}
+input[type="range"]{width:100%;accent-color:var(--accent);background:transparent;margin:6px 0;}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:0.78rem;color:var(--muted);}
+.toggle-row input[type="checkbox"]{width:14px;height:14px;accent-color:var(--accent);}
+/* Calc */
+.calc-btn{padding:14px 6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Space Mono',monospace;font-size:0.95rem;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.15s;width:100%;}
+.calc-btn:hover{background:var(--border);transform:scale(1.04);}
+.calc-btn:active{transform:scale(0.96);}
+.calc-btn.calc-op{background:rgba(124,58,237,0.2);border-color:var(--accent);color:var(--accent2);}
+.calc-btn.calc-eq{background:var(--accent);border-color:var(--accent);color:#fff;font-size:1.1rem;}
+.calc-btn.calc-eq:hover{background:#6d28d9;}
+.calc-btn.calc-fn{background:var(--surface);color:var(--muted);font-size:0.75rem;}
+.calc-btn.calc-fn:hover{color:var(--text);border-color:var(--accent);}
+/* Translate */
+.lang-output{font-family:'Noto Sans SC','Noto Sans JP','Noto Sans KR','Noto Sans Arabic','Noto Sans Thai','Noto Sans Devanagari','Noto Sans','Space Mono',sans-serif;font-size:0.9rem;line-height:2;}
+.phrase-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:0.7rem;padding:5px 11px;border-radius:20px;cursor:pointer;transition:all 0.2s;}
+.phrase-btn:hover{border-color:var(--accent2);color:var(--accent2);}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tr-spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;margin-right:8px;vertical-align:middle;}
+/* About badge */
+.about-badge{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:0.7rem;padding:4px 11px;border-radius:20px;cursor:default;transition:all 0.2s;}
+.about-badge:hover{border-color:var(--accent);color:var(--text);}
+/* Gradient presets */
+.gr-preset{height:36px;border-radius:6px;cursor:pointer;border:1px solid var(--border);transition:transform 0.2s;}
+.gr-preset:hover{transform:scale(1.06);}
+/* CSV table */
+#csv-table-wrap table{width:100%;border-collapse:collapse;font-size:0.8rem;}
+#csv-table-wrap th{background:var(--surface2);border:1px solid var(--border);padding:7px 11px;text-align:left;color:var(--accent2);}
+#csv-table-wrap td{border:1px solid var(--border);padding:5px 11px;color:var(--text);}
+/* Markdown */
+.md-body h1,.md-body h2,.md-body h3{font-family:'Syne',sans-serif;color:var(--accent2);margin:12px 0 6px;}
+.md-body p{margin:6px 0;line-height:1.8;}
+.md-body code{background:var(--surface2);padding:2px 5px;border-radius:4px;color:var(--accent3);font-size:0.82rem;}
+.md-body pre{background:var(--surface2);padding:12px;border-radius:6px;overflow-x:auto;margin:8px 0;}
+.md-body blockquote{border-left:3px solid var(--accent);padding-left:12px;color:var(--muted);margin:6px 0;}
+.md-body hr{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.md-body a{color:var(--accent2);text-decoration:underline;}
+.md-body li{margin-left:20px;margin-bottom:3px;}
+.md-body mark{background:rgba(124,58,237,0.35);color:var(--text);border-radius:3px;padding:1px 2px;}
+/* Notif */
+.notif{position:fixed;bottom:22px;right:22px;background:var(--success);color:#000;font-family:'Space Mono',monospace;font-size:0.78rem;padding:10px 18px;border-radius:8px;z-index:1000;opacity:0;transform:translateY(10px);transition:all 0.3s;pointer-events:none;}
+.notif.show{opacity:1;transform:translateY(0);}
+/* Badge */
+.badge{display:inline-block;background:var(--surface2);border:1px solid var(--border);padding:3px 9px;border-radius:20px;font-size:0.68rem;color:var(--muted);margin:3px;}
+footer{text-align:center;padding:36px 0;color:var(--muted);font-size:0.72rem;letter-spacing:2px;border-top:1px solid var(--border);margin-top:50px;}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>⚡ TOOLBOX</h1>
+    <p>Kumpulan tools berguna — gratis, cepat, privat</p>
+  </header>
+  <div class="tool-tabs">
+    <button class="tab-btn active" onclick="sw('text',this)">📝 Text</button>
+    <button class="tab-btn" onclick="sw('password',this)">🔐 Password</button>
+    <button class="tab-btn" onclick="sw('base64',this)">🔄 Base64</button>
+    <button class="tab-btn" onclick="sw('json',this)">📦 JSON</button>
+    <button class="tab-btn" onclick="sw('color',this)">🎨 Warna</button>
+    <button class="tab-btn" onclick="sw('unit',this)">📏 Unit</button>
+    <button class="tab-btn" onclick="sw('hash',this)">🔑 Hash</button>
+    <button class="tab-btn" onclick="sw('time',this)">⏰ Waktu</button>
+    <button class="tab-btn" onclick="sw('calc',this)">🧮 Kalkulator</button>
+    <button class="tab-btn" onclick="sw('translate',this)">🌐 Translate</button>
+    <button class="tab-btn" onclick="sw('qr',this)">📷 QR Code</button>
+    <button class="tab-btn" onclick="sw('random',this)">🎲 Random</button>
+    <button class="tab-btn" onclick="sw('markdown',this)">📄 Markdown</button>
+    <button class="tab-btn" onclick="sw('regex',this)">🔍 Regex</button>
+    <button class="tab-btn" onclick="sw('timer',this)">⏱️ Timer</button>
+    <button class="tab-btn" onclick="sw('csv',this)">📊 CSV→Tabel</button>
+    <button class="tab-btn" onclick="sw('gradient',this)">🌈 Gradient</button>
+    <button class="tab-btn" onclick="sw('minifier',this)">🗜️ Minifier</button>
+    <button class="tab-btn" onclick="sw('about',this)">👤 Tentang</button>
+  </div>
+
+  <!-- TEXT -->
+  <div id="tab-text" class="tool-panel active">
+    <div class="panel-card">
+      <div class="panel-title">Text Analyzer & Converter</div>
+      <div class="panel-desc">// Hitung & ubah format teks</div>
+      <label>Masukkan Teks</label>
+      <textarea id="text-input" placeholder="Ketik atau paste teks..." oninput="analyzeText()"></textarea>
+      <div class="stats-row">
+        <div class="stat-chip">Karakter: <span id="sc">0</span></div>
+        <div class="stat-chip">Kata: <span id="sw2">0</span></div>
+        <div class="stat-chip">Kalimat: <span id="ss">0</span></div>
+        <div class="stat-chip">Baris: <span id="sl">0</span></div>
+        <div class="stat-chip">No Spasi: <span id="sn">0</span></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="cvCase('upper')">UPPERCASE</button>
+        <button class="btn btn-primary" onclick="cvCase('lower')">lowercase</button>
+        <button class="btn btn-primary" onclick="cvCase('title')">Title Case</button>
+        <button class="btn btn-secondary" onclick="cvCase('reverse')">esreveR</button>
+        <button class="btn btn-secondary" onclick="cvCase('trim')">Trim Spasi</button>
+        <button class="btn btn-secondary" onclick="cvCase('slug')">slug-case</button>
+      </div>
+      <div class="output-box" id="text-out">—<button class="copy-btn" onclick="cpOut('text-out')">COPY</button></div>
+    </div>
+  </div>
+
+  <!-- PASSWORD -->
+  <div id="tab-password" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Password Generator</div>
+      <div class="panel-desc">// Buat password kuat secara kriptografis aman</div>
+      <label>Panjang: <span id="pld">16</span> karakter</label>
+      <input type="range" id="plen" min="6" max="128" value="16" oninput="document.getElementById('pld').textContent=this.value;genPass()">
+      <div class="toggle-row"><input type="checkbox" id="pu" checked onchange="genPass()"> Huruf Besar (A-Z)</div>
+      <div class="toggle-row"><input type="checkbox" id="pl" checked onchange="genPass()"> Huruf Kecil (a-z)</div>
+      <div class="toggle-row"><input type="checkbox" id="pn" checked onchange="genPass()"> Angka (0-9)</div>
+      <div class="toggle-row"><input type="checkbox" id="ps" onchange="genPass()"> Simbol (!@#$...)</div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="genPass()">🎲 Generate</button>
+        <button class="btn btn-secondary" onclick="genPassMulti()">Generate 5x</button>
+      </div>
+      <div class="output-box" id="pass-out">—<button class="copy-btn" onclick="cpOut('pass-out')">COPY</button></div>
+      <div class="strength-bar"><div class="strength-fill" id="sfill" style="width:0%"></div></div>
+      <div style="margin-top:5px;font-size:0.72rem;color:var(--muted)" id="slabel"></div>
+    </div>
+  </div>
+
+  <!-- BASE64 -->
+  <div id="tab-base64" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Base64 & URL Encoder</div>
+      <div class="panel-desc">// Encode & decode Base64 dan URL</div>
+      <label>Input</label>
+      <textarea id="b64-in" placeholder="Teks atau Base64..."></textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="b64('encode')">Encode → Base64</button>
+        <button class="btn btn-cyan" onclick="b64('decode')">Decode ← Base64</button>
+        <button class="btn btn-secondary" onclick="b64('url-enc')">URL Encode</button>
+        <button class="btn btn-secondary" onclick="b64('url-dec')">URL Decode</button>
+      </div>
+      <div class="output-box" id="b64-out">—<button class="copy-btn" onclick="cpOut('b64-out')">COPY</button></div>
+    </div>
+  </div>
+
+  <!-- JSON -->
+  <div id="tab-json" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">JSON Formatter & Validator</div>
+      <div class="panel-desc">// Format, minify, validasi JSON</div>
+      <textarea id="json-in" placeholder='{"nama":"Adam","ganteng":true}' style="min-height:160px;"></textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="fmtJson('pretty')">✨ Beautify</button>
+        <button class="btn btn-secondary" onclick="fmtJson('minify')">Minify</button>
+        <button class="btn btn-secondary" onclick="fmtJson('validate')">Validasi</button>
+        <button class="btn btn-secondary" onclick="fmtJson('keys')">Keys</button>
+      </div>
+      <div class="output-box" id="json-out" style="min-height:120px;">—<button class="copy-btn" onclick="cpOut('json-out')">COPY</button></div>
+    </div>
+  </div>
+
+  <!-- COLOR -->
+  <div id="tab-color" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Color Converter</div>
+      <div class="panel-desc">// Konversi HEX, RGB, HSL</div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:8px;">
+        <input type="color" id="cpicker" value="#7c3aed" oninput="fromPicker()">
+        <input type="text" id="chex" value="#7c3aed" style="width:160px" oninput="fromHex()">
+        <button class="btn btn-cyan" onclick="randColor()">🎲 Random</button>
+      </div>
+      <div id="cpreview" style="height:80px;border-radius:8px;margin-top:14px;border:1px solid var(--border);background:#7c3aed;transition:background 0.3s;"></div>
+      <div class="stats-row">
+        <div class="stat-chip">HEX: <span id="cvhex">#7c3aed</span></div>
+        <div class="stat-chip">RGB: <span id="cvrgb">rgb(124,58,237)</span></div>
+        <div class="stat-chip">HSL: <span id="cvhsl">hsl(262,84%,58%)</span></div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="copyText(document.getElementById('cvhex').textContent)">Copy HEX</button>
+        <button class="btn btn-secondary" onclick="copyText(document.getElementById('cvrgb').textContent)">Copy RGB</button>
+        <button class="btn btn-secondary" onclick="copyText(document.getElementById('cvhsl').textContent)">Copy HSL</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNIT -->
+  <div id="tab-unit" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Unit Converter</div>
+      <div class="panel-desc">// Konversi berbagai satuan</div>
+      <label>Kategori</label>
+      <select id="ucat" onchange="updateUnits()">
+        <option value="length">Panjang</option><option value="weight">Berat</option>
+        <option value="temp">Suhu</option><option value="area">Luas</option>
+        <option value="speed">Kecepatan</option><option value="data">Data Digital</option>
+      </select>
+      <div class="grid-2" style="margin-top:14px;">
+        <div><label>Dari</label><select id="ufrom"></select><input type="number" id="uval" value="1" oninput="cvUnit()" style="margin-top:8px;"></div>
+        <div><label>Ke</label><select id="uto"></select><div class="output-box" id="uout" style="margin-top:8px;min-height:44px;">—</div></div>
+      </div>
+      <button class="btn btn-secondary" onclick="swapUnit()" style="margin-top:10px;">⇄ Swap</button>
+    </div>
+  </div>
+
+  <!-- HASH -->
+  <div id="tab-hash" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Hash Generator</div>
+      <div class="panel-desc">// DJB2, FNV-1a, CRC32, SHA-256</div>
+      <textarea id="hash-in" placeholder="Teks untuk di-hash..."></textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="doHash('djb2')">DJB2</button>
+        <button class="btn btn-primary" onclick="doHash('fnv')">FNV-1a</button>
+        <button class="btn btn-cyan" onclick="doHash('sha256')">SHA-256</button>
+        <button class="btn btn-secondary" onclick="doHash('crc32')">CRC32</button>
+      </div>
+      <div class="output-box" id="hash-out">—<button class="copy-btn" onclick="cpOut('hash-out')">COPY</button></div>
+    </div>
+  </div>
+
+  <!-- TIME -->
+  <div id="tab-time" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Timestamp & Waktu</div>
+      <div class="panel-desc">// Konversi Unix timestamp & selisih tanggal</div>
+      <div class="stats-row">
+        <div class="stat-chip">Unix Now: <span id="tsn">—</span></div>
+        <div class="stat-chip">ISO: <span id="tsiso">—</span></div>
+        <div class="stat-chip">WIB: <span id="tswib">—</span></div>
+      </div>
+      <label style="margin-top:20px;">Unix Timestamp → Tanggal</label>
+      <input type="number" id="tsin" placeholder="1700000000">
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="cvTs()">Konversi</button>
+        <button class="btn btn-secondary" onclick="document.getElementById('tsin').value=Math.floor(Date.now()/1000)">Sekarang</button>
+      </div>
+      <div class="output-box" id="ts-out">—<button class="copy-btn" onclick="cpOut('ts-out')">COPY</button></div>
+      <label style="margin-top:20px;">Selisih 2 Tanggal</label>
+      <div class="grid-2">
+        <div><label>Dari</label><input type="text" id="dfrom" placeholder="2024-01-01"></div>
+        <div><label>Sampai</label><input type="text" id="dto" placeholder="2025-01-01"></div>
+      </div>
+      <div class="btn-group"><button class="btn btn-cyan" onclick="cvDiff()">Hitung</button></div>
+      <div class="output-box" id="diff-out">—</div>
+    </div>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div id="tab-calc" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Kalkulator</div>
+      <div class="panel-desc">// Standar, Saintifik, Persen, Cicilan</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
+        <button class="btn btn-primary" id="cm-std" onclick="setCalcMode('std')">Standar</button>
+        <button class="btn btn-secondary" id="cm-sci" onclick="setCalcMode('sci')">Saintifik</button>
+        <button class="btn btn-secondary" id="cm-pct" onclick="setCalcMode('pct')">Persen</button>
+        <button class="btn btn-secondary" id="cm-loan" onclick="setCalcMode('loan')">Cicilan</button>
+      </div>
+      <!-- Standard -->
+      <div id="calc-std">
+        <div id="chist" style="min-height:20px;font-size:0.7rem;color:var(--muted);text-align:right;"></div>
+        <div id="cdisp" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:2rem;text-align:right;color:var(--accent2);margin-bottom:10px;min-height:66px;word-break:break-all;">0</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;">
+          <button class="calc-btn calc-fn" onclick="cFn('AC')">AC</button><button class="calc-btn calc-fn" onclick="cFn('+/-')">+/-</button><button class="calc-btn calc-fn" onclick="cFn('%')">%</button><button class="calc-btn calc-op" onclick="cOp('/')">÷</button>
+          <button class="calc-btn" onclick="cNum('7')">7</button><button class="calc-btn" onclick="cNum('8')">8</button><button class="calc-btn" onclick="cNum('9')">9</button><button class="calc-btn calc-op" onclick="cOp('*')">×</button>
+          <button class="calc-btn" onclick="cNum('4')">4</button><button class="calc-btn" onclick="cNum('5')">5</button><button class="calc-btn" onclick="cNum('6')">6</button><button class="calc-btn calc-op" onclick="cOp('-')">−</button>
+          <button class="calc-btn" onclick="cNum('1')">1</button><button class="calc-btn" onclick="cNum('2')">2</button><button class="calc-btn" onclick="cNum('3')">3</button><button class="calc-btn calc-op" onclick="cOp('+')">+</button>
+          <button class="calc-btn" onclick="cNum('0')" style="grid-column:span 2;">0</button><button class="calc-btn" onclick="cNum('.')">.</button><button class="calc-btn calc-eq" onclick="cEq()">=</button>
+        </div>
+        <div style="text-align:right;margin-top:7px;"><button class="calc-btn calc-fn" onclick="cFn('back')" style="width:auto;padding:7px 18px;">⌫</button></div>
+      </div>
+      <!-- Scientific -->
+      <div id="calc-sci" style="display:none;">
+        <div id="schist" style="min-height:20px;font-size:0.7rem;color:var(--muted);text-align:right;"></div>
+        <div id="scdisp" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:1.7rem;text-align:right;color:var(--accent2);margin-bottom:10px;min-height:66px;">0</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">
+          <button class="calc-btn calc-fn" onclick="scFn('sin')">sin</button><button class="calc-btn calc-fn" onclick="scFn('cos')">cos</button><button class="calc-btn calc-fn" onclick="scFn('tan')">tan</button><button class="calc-btn calc-fn" onclick="scFn('log')">log</button><button class="calc-btn calc-fn" onclick="scFn('ln')">ln</button>
+          <button class="calc-btn calc-fn" onclick="scFn('sqrt')">√</button><button class="calc-btn calc-fn" onclick="scFn('pow2')">x²</button><button class="calc-btn calc-fn" onclick="scFn('pow3')">x³</button><button class="calc-btn calc-op" onclick="scOp('**')">xⁿ</button><button class="calc-btn calc-fn" onclick="scFn('inv')">1/x</button>
+          <button class="calc-btn calc-fn" onclick="scFn('pi')">π</button><button class="calc-btn calc-fn" onclick="scFn('e')">e</button><button class="calc-btn calc-fn" onclick="scFn('abs')">|x|</button><button class="calc-btn calc-fn" onclick="scFn('fact')">n!</button><button class="calc-btn calc-fn" onclick="scFn('AC')">AC</button>
+          <button class="calc-btn" onclick="scNum('7')">7</button><button class="calc-btn" onclick="scNum('8')">8</button><button class="calc-btn" onclick="scNum('9')">9</button><button class="calc-btn calc-op" onclick="scOp('/')">÷</button><button class="calc-btn calc-op" onclick="scOp('*')">×</button>
+          <button class="calc-btn" onclick="scNum('4')">4</button><button class="calc-btn" onclick="scNum('5')">5</button><button class="calc-btn" onclick="scNum('6')">6</button><button class="calc-btn calc-op" onclick="scOp('-')">−</button><button class="calc-btn calc-op" onclick="scOp('+')">+</button>
+          <button class="calc-btn" onclick="scNum('1')">1</button><button class="calc-btn" onclick="scNum('2')">2</button><button class="calc-btn" onclick="scNum('3')">3</button><button class="calc-btn" onclick="scNum('0')">0</button><button class="calc-btn" onclick="scNum('.')">.</button>
+          <button class="calc-btn calc-fn" onclick="scFn('back')">⌫</button><button class="calc-btn calc-fn" onclick="scFn('+/-')">+/-</button><button class="calc-btn calc-fn" onclick="scFn('%')">%</button><button class="calc-btn calc-eq" onclick="scEq()" style="grid-column:span 2;">=</button>
+        </div>
+      </div>
+      <!-- Percent -->
+      <div id="calc-pct" style="display:none;">
+        <div class="grid-2">
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px;">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2);margin-bottom:12px;">Hitung Diskon</div>
+            <label>Harga Asli (Rp)</label><input type="number" id="disc-p" placeholder="100000" oninput="calcDisc()">
+            <label>Diskon (%)</label><input type="number" id="disc-pct" placeholder="20" oninput="calcDisc()">
+            <div class="output-box" id="disc-out" style="margin-top:10px;">—</div>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px;">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent3);margin-bottom:12px;">Persentase Perubahan</div>
+            <label>Nilai Awal</label><input type="number" id="chg-f" placeholder="80" oninput="calcChg()">
+            <label>Nilai Akhir</label><input type="number" id="chg-t" placeholder="100" oninput="calcChg()">
+            <div class="output-box" id="chg-out" style="margin-top:10px;">—</div>
+          </div>
+        </div>
+      </div>
+      <!-- Loan -->
+      <div id="calc-loan" style="display:none;">
+        <div class="grid-2">
+          <div><label>Total Pinjaman (Rp)</label><input type="number" id="la" placeholder="500000000" oninput="calcLoan()"></div>
+          <div><label>Bunga/Tahun (%)</label><input type="number" id="lr" placeholder="7.5" step="0.1" oninput="calcLoan()"></div>
+          <div><label>Tenor (Tahun)</label><input type="number" id="ly" placeholder="15" oninput="calcLoan()"></div>
+          <div><label>DP (Rp)</label><input type="number" id="ldp" placeholder="0" oninput="calcLoan()"></div>
+        </div>
+        <div class="output-box" id="loan-out" style="min-height:100px;">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANSLATE -->
+  <div id="tab-translate" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">AI Translator</div>
+      <div class="panel-desc">// Powered by Claude AI — akurat & natural</div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:14px;">
+        <div><label>Dari</label>
+          <select id="tr-from">
+            <option value="auto">🔍 Deteksi Otomatis</option>
+            <option value="Indonesia">Indonesia</option><option value="Inggris">Inggris</option>
+            <option value="Jepang">Jepang</option><option value="Korea">Korea</option>
+            <option value="Mandarin">Mandarin</option><option value="Arab">Arab</option>
+            <option value="Spanyol">Spanyol</option><option value="Prancis">Prancis</option>
+            <option value="Jerman">Jerman</option><option value="Hindi">Hindi</option>
+            <option value="Thailand">Thailand</option><option value="Vietnam">Vietnam</option>
+            <option value="Jawa">Jawa</option><option value="Sunda">Sunda</option>
+          </select>
+        </div>
+        <button class="btn btn-secondary" onclick="swapLang()" style="padding:9px 12px;margin-bottom:0;">⇄</button>
+        <div><label>Ke</label>
+          <select id="tr-to">
+            <option value="Indonesia">Indonesia</option><option value="Inggris" selected>Inggris</option>
+            <option value="Jepang">Jepang</option><option value="Korea">Korea</option>
+            <option value="Mandarin">Mandarin</option><option value="Arab">Arab</option>
+            <option value="Spanyol">Spanyol</option><option value="Prancis">Prancis</option>
+            <option value="Jerman">Jerman</option><option value="Hindi">Hindi</option>
+            <option value="Thailand">Thailand</option><option value="Vietnam">Vietnam</option>
+            <option value="Jawa">Jawa</option><option value="Sunda">Sunda</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>Teks Asli</label>
+          <textarea id="tr-in" placeholder="Ketik teks..." style="min-height:180px;" oninput="trCharCount()"></textarea>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;"><span id="tr-cc" style="font-size:0.72rem;color:var(--muted);">0 karakter</span><button class="btn btn-secondary" onclick="clearTr()" style="padding:4px 10px;font-size:0.68rem;">Hapus</button></div>
+        </div>
+        <div>
+          <label>Hasil</label>
+          <div id="tr-out" class="lang-output" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;min-height:180px;color:var(--accent2);white-space:pre-wrap;word-break:break-word;"><span style="color:var(--muted);font-size:0.78rem;">— hasil terjemahan —</span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;"><span id="tr-det" style="font-size:0.72rem;color:var(--muted);"></span><button class="btn btn-secondary" id="tr-cp" onclick="cpTranslate()" style="padding:4px 10px;font-size:0.68rem;">Copy</button></div>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="doTranslate()" id="tr-btn">🌐 Terjemahkan</button>
+        <label style="margin:0;display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:0.72rem;"><input type="checkbox" id="tr-auto" style="width:13px;height:13px;accent-color:var(--accent);"> Auto translate</label>
+      </div>
+      <div id="tr-load" style="display:none;margin-top:12px;text-align:center;color:var(--muted);font-size:0.82rem;"><div class="tr-spinner"></div>Menerjemahkan...</div>
+      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+        <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Frasa Cepat</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">
+          <button class="phrase-btn" onclick="quickTr('Halo, apa kabar?')">Halo, apa kabar?</button>
+          <button class="phrase-btn" onclick="quickTr('Terima kasih banyak')">Terima kasih</button>
+          <button class="phrase-btn" onclick="quickTr('Di mana stasiun terdekat?')">Di mana stasiun?</button>
+          <button class="phrase-btn" onclick="quickTr('Berapa harganya?')">Berapa harganya?</button>
+          <button class="phrase-btn" onclick="quickTr('Saya tidak mengerti')">Tidak mengerti</button>
+          <button class="phrase-btn" onclick="quickTr('Selamat pagi')">Selamat pagi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR CODE -->
+  <div id="tab-qr" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">QR Code Generator</div>
+      <div class="panel-desc">// Buat QR Code dari teks atau URL</div>
+      <label>Teks / URL</label>
+      <textarea id="qr-in" placeholder="https://example.com atau teks apapun..." style="min-height:80px;" oninput="qrLive()"></textarea>
+      <div class="grid-2" style="margin-top:12px;">
+        <div><label>Ukuran</label>
+          <select id="qr-size" onchange="genQR()">
+            <option value="150">150px</option><option value="200" selected>200px</option>
+            <option value="300">300px</option><option value="400">400px</option>
+          </select>
+        </div>
+        <div><label>Error Correction</label>
+          <select id="qr-ec" onchange="genQR()">
+            <option value="L">L — 7%</option><option value="M" selected>M — 15%</option>
+            <option value="Q">Q — 25%</option><option value="H">H — 30%</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="genQR()">📷 Generate QR</button>
+        <button class="btn btn-secondary" onclick="dlQR()">⬇ Download PNG</button>
+      </div>
+      <div style="margin-top:18px;text-align:center;">
+        <canvas id="qr-canvas" style="border:1px solid var(--border);border-radius:8px;display:none;background:#fff;"></canvas>
+        <div id="qr-ph" style="color:var(--muted);font-size:0.78rem;margin-top:10px;">— QR Code akan muncul di sini —</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RANDOM -->
+  <div id="tab-random" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Random Generator</div>
+      <div class="panel-desc">// UUID, angka, warna, nama, dadu, koin</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2);margin-bottom:10px;">🔑 UUID v4</div>
+          <div id="r-uuid" style="font-size:0.68rem;color:var(--accent2);word-break:break-all;min-height:28px;">—</div>
+          <div class="btn-group" style="margin-top:8px;">
+            <button class="btn btn-primary" onclick="rUUID()" style="padding:5px 10px;font-size:0.68rem;">Gen</button>
+            <button class="btn btn-secondary" onclick="copyText(document.getElementById('r-uuid').textContent)" style="padding:5px 10px;font-size:0.68rem;">Copy</button>
+          </div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent3);margin-bottom:10px;">🎲 Angka Random</div>
+          <div class="grid-2" style="gap:7px;">
+            <div><label style="margin:0 0 3px;font-size:0.62rem;">Min</label><input type="number" id="r-min" value="1" style="padding:5px;font-size:0.78rem;"></div>
+            <div><label style="margin:0 0 3px;font-size:0.62rem;">Max</label><input type="number" id="r-max" value="100" style="padding:5px;font-size:0.78rem;"></div>
+          </div>
+          <div id="r-num" style="font-size:2rem;font-weight:800;color:var(--accent3);text-align:center;margin:7px 0;transition:transform 0.2s;">—</div>
+          <button class="btn btn-secondary" onclick="rNum()" style="width:100%;padding:5px;font-size:0.68rem;">🎲 Roll!</button>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--success);margin-bottom:10px;">🎨 Warna Random</div>
+          <div id="r-cbox" style="height:56px;border-radius:8px;background:#7c3aed;margin-bottom:7px;transition:background 0.4s;"></div>
+          <div id="r-cval" style="font-size:0.72rem;color:var(--muted);text-align:center;margin-bottom:7px;">#7c3aed</div>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="rColor()" style="flex:1;padding:5px;font-size:0.68rem;">Random</button>
+            <button class="btn btn-secondary" onclick="copyText(document.getElementById('r-cval').textContent)" style="flex:1;padding:5px;font-size:0.68rem;">Copy</button>
+          </div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);margin-bottom:10px;">🪙 Koin & 🎲 Dadu</div>
+          <div id="r-coin" style="font-size:2.5rem;text-align:center;margin:4px 0;transition:transform 0.3s;">🪙</div>
+          <div id="r-coinlbl" style="text-align:center;font-size:0.78rem;color:var(--muted);margin-bottom:7px;">—</div>
+          <button class="btn btn-primary" onclick="rCoin()" style="width:100%;padding:5px;font-size:0.68rem;margin-bottom:8px;">Lempar Koin!</button>
+          <select id="r-dice" style="margin-bottom:6px;font-size:0.78rem;"><option value="6" selected>D6</option><option value="4">D4</option><option value="8">D8</option><option value="12">D12</option><option value="20">D20</option><option value="100">D100</option></select>
+          <div id="r-dres" style="font-size:1.8rem;text-align:center;">🎲</div>
+          <button class="btn btn-secondary" onclick="rDice()" style="width:100%;padding:5px;font-size:0.68rem;margin-top:5px;">Roll Dadu!</button>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2);margin-bottom:10px;">👤 Nama Random</div>
+          <select id="r-ntype" style="margin-bottom:7px;font-size:0.78rem;"><option value="id">Indonesia</option><option value="en">Inggris</option><option value="jp">Jepang</option></select>
+          <div id="r-name" style="font-size:1rem;font-weight:700;color:var(--accent2);min-height:24px;margin-bottom:7px;">—</div>
+          <div class="btn-group">
+            <button class="btn btn-secondary" onclick="rName()" style="flex:1;padding:5px;font-size:0.68rem;">Gen</button>
+            <button class="btn btn-secondary" onclick="copyText(document.getElementById('r-name').textContent)" style="flex:1;padding:5px;font-size:0.68rem;">Copy</button>
+          </div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:10px;">📋 Pilih Acak dari List</div>
+          <textarea id="r-list" placeholder="Pizza&#10;Bakso&#10;Nasi Goreng&#10;Soto" style="min-height:80px;font-size:0.78rem;"></textarea>
+          <div class="btn-group" style="margin-top:7px;">
+            <button class="btn btn-primary" onclick="rPick(1)" style="flex:1;padding:5px;font-size:0.68rem;">Pilih 1</button>
+            <button class="btn btn-secondary" onclick="rPick(3)" style="flex:1;padding:5px;font-size:0.68rem;">Pilih 3</button>
+          </div>
+          <div class="output-box" id="r-pick" style="margin-top:8px;min-height:44px;">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKDOWN -->
+  <div id="tab-markdown" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Markdown Preview</div>
+      <div class="panel-desc">// Tulis & preview Markdown secara live</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+        <button class="btn btn-secondary" onclick="mdIns('**bold**')" style="padding:4px 9px;font-size:0.68rem;"><b>B</b></button>
+        <button class="btn btn-secondary" onclick="mdIns('*italic*')" style="padding:4px 9px;font-size:0.68rem;"><i>I</i></button>
+        <button class="btn btn-secondary" onclick="mdIns('# Heading')" style="padding:4px 9px;font-size:0.68rem;">H1</button>
+        <button class="btn btn-secondary" onclick="mdIns('## Heading')" style="padding:4px 9px;font-size:0.68rem;">H2</button>
+        <button class="btn btn-secondary" onclick="mdIns('[teks](url)')" style="padding:4px 9px;font-size:0.68rem;">🔗</button>
+        <button class="btn btn-secondary" onclick="mdIns('\`kode\`')" style="padding:4px 9px;font-size:0.68rem;">&lt;&gt;</button>
+        <button class="btn btn-secondary" onclick="mdIns('- item')" style="padding:4px 9px;font-size:0.68rem;">• List</button>
+        <button class="btn btn-secondary" onclick="mdIns('> quote')" style="padding:4px 9px;font-size:0.68rem;">" Quote</button>
+        <button class="btn btn-secondary" onclick="mdIns('---')" style="padding:4px 9px;font-size:0.68rem;">HR</button>
+        <button class="btn btn-primary" onclick="mdSample()" style="padding:4px 9px;font-size:0.68rem;">📄 Contoh</button>
+      </div>
+      <div class="grid-2">
+        <div><label>Editor</label><textarea id="md-in" placeholder="# Judul&#10;&#10;Tulis **markdown** di sini..." style="min-height:380px;font-size:0.8rem;" oninput="renderMd()"></textarea></div>
+        <div><label>Preview</label><div id="md-prev" class="md-body" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;min-height:380px;overflow-y:auto;line-height:1.8;color:var(--text);"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGEX -->
+  <div id="tab-regex" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Regex Tester</div>
+      <div class="panel-desc">// Uji ekspresi reguler dengan highlight real-time</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+        <span style="color:var(--muted);font-size:1.1rem;">/</span>
+        <input type="text" id="rx-pat" placeholder="pattern..." style="flex:1;" oninput="testRx()">
+        <span style="color:var(--muted);font-size:1.1rem;">/</span>
+        <input type="text" id="rx-flags" value="gi" style="width:65px;" oninput="testRx()">
+      </div>
+      <label>Teks Uji</label>
+      <textarea id="rx-in" placeholder="Teks untuk diuji..." style="min-height:100px;" oninput="testRx()"></textarea>
+      <label>Hasil (Match Dihighlight)</label>
+      <div id="rx-out" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;min-height:70px;font-size:0.82rem;line-height:1.8;white-space:pre-wrap;word-break:break-word;">—</div>
+      <div id="rx-stat" style="margin-top:7px;font-size:0.72rem;color:var(--muted);"></div>
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+        <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:9px;">Preset</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">
+          <button class="phrase-btn" onclick="rxPreset('Email','[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}','gi','Kirim ke adam@example.com atau winda@test.co.id')">📧 Email</button>
+          <button class="phrase-btn" onclick="rxPreset('URL','https?:\\/\\/[\\w\\-\\.]+\\.[a-z]{2,}[\\w\\-\\._~:\\/?#\\[\\]@!$&\'\\(\\)\\*\\+,;=]*','gi','Cek https://google.com dan https://github.com')">🔗 URL</button>
+          <button class="phrase-btn" onclick="rxPreset('No HP','(\\+62|0)[0-9]{9,12}','g','Hub. Adam 081234567890 atau +6281234567891')">📱 No. HP</button>
+          <button class="phrase-btn" onclick="rxPreset('Angka','\\d+','g','Harga Rp 150000 diskon 20% bayar Rp 120000')">🔢 Angka</button>
+          <button class="phrase-btn" onclick="rxPreset('Hashtag','#[\\w]+','g','#toolbox #adam #coding sangat keren!')">🏷️ Hashtag</button>
+          <button class="phrase-btn" onclick="rxPreset('IP','\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b','g','Server di 192.168.1.1 backup 10.0.0.1')">🌐 IP Address</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMER -->
+  <div id="tab-timer" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">Stopwatch & Countdown Timer</div>
+      <div class="panel-desc">// Stopwatch presisi & countdown dengan preset</div>
+      <div class="grid-2">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:22px;text-align:center;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2);margin-bottom:14px;font-size:0.75rem;letter-spacing:2px;">⏱ STOPWATCH</div>
+          <div id="sw-d" style="font-family:'Space Mono',monospace;font-size:2.5rem;font-weight:700;color:var(--text);letter-spacing:2px;margin-bottom:18px;">00:00:00.000</div>
+          <div class="btn-group" style="justify-content:center;">
+            <button class="btn btn-primary" id="sw-btn" onclick="swToggle()">▶ Start</button>
+            <button class="btn btn-secondary" onclick="swReset()">↺ Reset</button>
+            <button class="btn btn-secondary" onclick="swLap()">⚑ Lap</button>
+          </div>
+          <div id="sw-laps" style="margin-top:14px;max-height:130px;overflow-y:auto;font-size:0.72rem;text-align:left;"></div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:22px;text-align:center;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent3);margin-bottom:14px;font-size:0.75rem;letter-spacing:2px;">⏳ COUNTDOWN</div>
+          <div style="display:flex;gap:7px;justify-content:center;margin-bottom:14px;">
+            <div><label style="font-size:0.6rem;">Jam</label><input type="number" id="cd-h" value="0" min="0" max="23" style="width:55px;text-align:center;padding:7px 3px;font-size:1.1rem;"></div>
+            <div style="font-size:1.8rem;padding-top:14px;color:var(--muted);">:</div>
+            <div><label style="font-size:0.6rem;">Menit</label><input type="number" id="cd-m" value="5" min="0" max="59" style="width:55px;text-align:center;padding:7px 3px;font-size:1.1rem;"></div>
+            <div style="font-size:1.8rem;padding-top:14px;color:var(--muted);">:</div>
+            <div><label style="font-size:0.6rem;">Detik</label><input type="number" id="cd-s" value="0" min="0" max="59" style="width:55px;text-align:center;padding:7px 3px;font-size:1.1rem;"></div>
+          </div>
+          <div id="cd-d" style="font-family:'Space Mono',monospace;font-size:2.5rem;font-weight:700;color:var(--accent3);letter-spacing:2px;margin-bottom:18px;">00:05:00</div>
+          <div class="btn-group" style="justify-content:center;">
+            <button class="btn btn-cyan" id="cd-btn" onclick="cdToggle()">▶ Start</button>
+            <button class="btn btn-secondary" onclick="cdReset()">↺ Reset</button>
+          </div>
+          <div style="margin-top:12px;">
+            <div style="font-size:0.68rem;color:var(--muted);margin-bottom:7px;">Preset Cepat</div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;">
+              <button class="phrase-btn" onclick="cdPreset(1,0,0)">1 Menit</button>
+              <button class="phrase-btn" onclick="cdPreset(5,0,0)">5 Menit</button>
+              <button class="phrase-btn" onclick="cdPreset(25,0,0)">🍅 Pomodoro</button>
+              <button class="phrase-btn" onclick="cdPreset(60,0,0)">1 Jam</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSV TO TABLE -->
+  <div id="tab-csv" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">CSV → Tabel</div>
+      <div class="panel-desc">// Konversi CSV / TSV menjadi tabel rapi</div>
+      <div class="grid-2">
+        <div><label>Separator</label>
+          <select id="csv-sep" onchange="renderCsv()">
+            <option value=",">Koma (,)</option><option value=";">Titik koma (;)</option>
+            <option value="	">Tab (TSV)</option><option value="|">Pipe (|)</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:10px;padding-bottom:2px;">
+          <label class="toggle-row" style="margin:0;"><input type="checkbox" id="csv-hdr" checked onchange="renderCsv()"> Baris pertama = header</label>
+        </div>
+      </div>
+      <label>Input CSV</label>
+      <textarea id="csv-in" style="min-height:120px;font-size:0.8rem;" placeholder="Nama,Umur,Kota&#10;Adam,25,Jakarta&#10;Winda,22,Bandung" oninput="renderCsv()"></textarea>
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="csvSample()">📄 Contoh</button>
+        <button class="btn btn-secondary" onclick="csvExport('markdown')">Export Markdown</button>
+        <button class="btn btn-secondary" onclick="csvExport('html')">Export HTML</button>
+      </div>
+      <div id="csv-wrap" style="overflow-x:auto;margin-top:12px;border:1px solid var(--border);border-radius:8px;min-height:60px;"></div>
+      <div id="csv-stat" style="margin-top:7px;font-size:0.72rem;color:var(--muted);"></div>
+    </div>
+  </div>
+
+  <!-- GRADIENT -->
+  <div id="tab-gradient" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">CSS Gradient Generator</div>
+      <div class="panel-desc">// Buat gradient cantik & salin CSS-nya</div>
+      <div class="grid-2">
+        <div>
+          <label>Tipe</label><select id="gr-type" onchange="renderGr()"><option value="linear">Linear</option><option value="radial">Radial</option><option value="conic">Conic</option></select>
+          <label>Arah</label>
+          <select id="gr-dir" onchange="renderGr()">
+            <option value="to right">→ Kanan</option><option value="to left">← Kiri</option>
+            <option value="to bottom">↓ Bawah</option><option value="to top">↑ Atas</option>
+            <option value="135deg">135°</option><option value="45deg">45°</option>
+          </select>
+        </div>
+        <div>
+          <label>Warna 1</label>
+          <div style="display:flex;gap:7px;align-items:center;"><input type="color" id="gr-c1" value="#7c3aed" oninput="renderGr()" style="width:46px;height:34px;"><input type="text" id="gr-c1t" value="#7c3aed" style="flex:1;" oninput="syncGr(1)"></div>
+          <label>Warna 2</label>
+          <div style="display:flex;gap:7px;align-items:center;"><input type="color" id="gr-c2" value="#06b6d4" oninput="renderGr()" style="width:46px;height:34px;"><input type="text" id="gr-c2t" value="#06b6d4" style="flex:1;" oninput="syncGr(2)"></div>
+          <label>Warna 3 <input type="checkbox" id="gr-c3on" onchange="renderGr()" style="width:12px;height:12px;accent-color:var(--accent);vertical-align:middle;"> aktif</label>
+          <div style="display:flex;gap:7px;align-items:center;"><input type="color" id="gr-c3" value="#f59e0b" oninput="renderGr()" style="width:46px;height:34px;"><input type="text" id="gr-c3t" value="#f59e0b" style="flex:1;" oninput="syncGr(3)"></div>
+        </div>
+      </div>
+      <div id="gr-prev" style="height:130px;border-radius:10px;margin-top:14px;border:1px solid var(--border);transition:background 0.3s;"></div>
+      <div class="btn-group" style="margin-top:12px;">
+        <button class="btn btn-primary" onclick="copyText(document.getElementById('gr-css').value)">📋 Copy CSS</button>
+        <button class="btn btn-secondary" onclick="randGr()">🎲 Random</button>
+      </div>
+      <label>CSS Output</label>
+      <input type="text" id="gr-css" readonly style="font-size:0.76rem;color:var(--accent2);">
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px;">
+        <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Preset</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px;" id="gr-presets"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MINIFIER -->
+  <div id="tab-minifier" class="tool-panel">
+    <div class="panel-card">
+      <div class="panel-title">CSS / JS Minifier</div>
+      <div class="panel-desc">// Kompres kode, hapus whitespace & komentar</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <button class="btn btn-primary" id="mini-css" onclick="setMini('css')">CSS</button>
+        <button class="btn btn-secondary" id="mini-js" onclick="setMini('js')">JavaScript</button>
+      </div>
+      <label>Kode Input</label>
+      <textarea id="mini-in" placeholder="Paste kode CSS atau JS..." style="min-height:180px;font-size:0.8rem;"></textarea>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="doMinify()">🗜️ Minify!</button>
+        <button class="btn btn-secondary" onclick="doBeautify()">✨ Beautify</button>
+        <button class="btn btn-secondary" onclick="miniSample()">📄 Contoh</button>
+      </div>
+      <div class="stats-row" id="mini-stat" style="margin-top:12px;"></div>
+      <label>Hasil</label>
+      <div class="output-box" id="mini-out" style="min-height:100px;font-size:0.8rem;">—<button class="copy-btn" onclick="cpOut('mini-out')">COPY</button></div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div id="tab-about" class="tool-panel">
+    <div class="panel-card" style="text-align:center;padding:44px 28px;">
+      <div style="font-size:3rem;margin-bottom:10px;">⚡</div>
+      <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-1px;">TOOLBOX</div>
+      <div style="color:var(--muted);font-size:0.72rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:36px;">Kumpulan Tools Berguna</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:580px;margin:0 auto 36px;">
+        <!-- Adam -->
+        <div style="background:var(--bg);border:2px solid var(--accent);border-radius:16px;padding:26px 18px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:70px;height:70px;background:var(--accent);opacity:0.1;border-radius:50%;"></div>
+          <div style="font-size:2.8rem;margin-bottom:10px;">👑</div>
+          <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--accent2);margin-bottom:6px;">Adam</div>
+          <div style="display:inline-block;background:rgba(124,58,237,0.2);border:1px solid var(--accent);color:var(--accent);font-size:0.68rem;padding:2px 9px;border-radius:20px;margin-bottom:10px;">✨ YANG GANTENG</div>
+          <div style="color:var(--muted);font-size:0.76rem;line-height:1.7;">Pembuat & Developer<br>Pemilik ide brilliant<br><span style="color:var(--accent3);">🏆 Main Creator</span></div>
+        </div>
+        <!-- Winda -->
+        <div style="background:var(--bg);border:2px solid var(--border);border-radius:16px;padding:26px 18px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:70px;height:70px;background:var(--muted);opacity:0.08;border-radius:50%;"></div>
+          <div style="font-size:2.8rem;margin-bottom:10px;">😬</div>
+          <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--muted);margin-bottom:6px;">Winda</div>
+          <div style="display:inline-block;background:rgba(107,107,138,0.15);border:1px solid var(--border);color:var(--muted);font-size:0.68rem;padding:2px 9px;border-radius:20px;margin-bottom:10px;">💀 SI JELEK</div>
+          <div style="color:var(--muted);font-size:0.76rem;line-height:1.7;">Saudara Adam<br>Tester tidak resmi<br><span style="opacity:0.5;">🥈 Supporter (katanya)</span></div>
+        </div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px 24px;max-width:480px;margin:0 auto 32px;font-size:0.82rem;color:var(--muted);line-height:1.8;font-style:italic;">
+        "Dibuat dengan ❤️ oleh Adam yang ganteng,<br>didukung (mungkin) oleh Winda si jelek." 😄
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:24px;">
+        <div style="font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:14px;">19 Tools Tersedia</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center;">
+          <span class="about-badge">📝 Text</span><span class="about-badge">🔐 Password</span><span class="about-badge">🔄 Base64</span>
+          <span class="about-badge">📦 JSON</span><span class="about-badge">🎨 Warna</span><span class="about-badge">📏 Unit</span>
+          <span class="about-badge">🔑 Hash</span><span class="about-badge">⏰ Waktu</span><span class="about-badge">🧮 Kalkulator</span>
+          <span class="about-badge">🌐 Translate AI</span><span class="about-badge">📷 QR Code</span><span class="about-badge">🎲 Random</span>
+          <span class="about-badge">📄 Markdown</span><span class="about-badge">🔍 Regex</span><span class="about-badge">⏱️ Timer</span>
+          <span class="about-badge">📊 CSV→Tabel</span><span class="about-badge">🌈 Gradient</span><span class="about-badge">🗜️ Minifier</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <p>⚡ TOOLBOX by Adam yang Ganteng — Semua proses di browser, data aman</p>
+    <div style="margin-top:10px;">
+      <span class="badge">🔒 Client-Side</span><span class="badge">⚡ Tanpa Login</span>
+      <span class="badge">🆓 Gratis</span><span class="badge">❤️ by Adam</span>
+    </div>
+  </div>
+</footer>
+<div class="notif" id="notif">✓ Disalin!</div>
+
+<script>
+// ===== TAB SWITCH =====
+function sw(name,btn){
+  document.querySelectorAll('.tool-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+// ===== NOTIF =====
+function showNotif(m='✓ Disalin!'){const n=document.getElementById('notif');n.textContent=m;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2000);}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>showNotif());}
+function cpOut(id){const el=document.getElementById(id);const text=el.innerText.replace(/COPY$|COPIED!$/,'').trim();navigator.clipboard.writeText(text).then(()=>{const b=el.querySelector('.copy-btn');if(b){b.textContent='COPIED!';b.classList.add('copied');setTimeout(()=>{b.textContent='COPY';b.classList.remove('copied');},2000);}showNotif();});}
+
+// ===== TEXT =====
+function analyzeText(){const t=document.getElementById('text-input').value;document.getElementById('sc').textContent=t.length;document.getElementById('sw2').textContent=t.trim()?t.trim().split(/\s+/).length:0;document.getElementById('ss').textContent=(t.match(/[.!?]+/g)||[]).length;document.getElementById('sl').textContent=t?t.split('\n').length:0;document.getElementById('sn').textContent=t.replace(/\s/g,'').length;}
+function cvCase(type){const t=document.getElementById('text-input').value;let o='';switch(type){case'upper':o=t.toUpperCase();break;case'lower':o=t.toLowerCase();break;case'title':o=t.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());break;case'reverse':o=t.split('').reverse().join('');break;case'trim':o=t.replace(/\s+/g,' ').trim();break;case'slug':o=t.toLowerCase().trim().replace(/[^\w\s-]/g,'').replace(/[\s_]+/g,'-').replace(/^-+|-+$/g,'');break;}const b=document.getElementById('text-out');b.childNodes[0].textContent=o||'(kosong)';}
+
+// ===== PASSWORD =====
+function genPass(){const len=parseInt(document.getElementById('plen').value);let chars='';if(document.getElementById('pu').checked)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';if(document.getElementById('pl').checked)chars+='abcdefghijklmnopqrstuvwxyz';if(document.getElementById('pn').checked)chars+='0123456789';if(document.getElementById('ps').checked)chars+='!@#$%^&*()_+-=[]{}|;:,.<>?';if(!chars){document.getElementById('pass-out').childNodes[0].textContent='⚠ Pilih satu opsi';return;}const arr=new Uint32Array(len);crypto.getRandomValues(arr);const p=Array.from(arr).map(v=>chars[v%chars.length]).join('');document.getElementById('pass-out').childNodes[0].textContent=p;pwStrength(p);}
+function genPassMulti(){const a=[];for(let i=0;i<5;i++){genPass();a.push(document.getElementById('pass-out').childNodes[0].textContent);}document.getElementById('pass-out').childNodes[0].textContent=a.join('\n');}
+function pwStrength(p){let s=0;if(p.length>=8)s++;if(p.length>=12)s++;if(p.length>=20)s++;if(/[A-Z]/.test(p))s++;if(/[a-z]/.test(p))s++;if(/[0-9]/.test(p))s++;if(/[^A-Za-z0-9]/.test(p))s++;const pct=Math.min(100,(s/7)*100);const f=document.getElementById('sfill');const l=document.getElementById('slabel');f.style.width=pct+'%';if(pct<30){f.style.background='#ef4444';l.textContent='Lemah';}else if(pct<60){f.style.background='#f59e0b';l.textContent='Sedang';}else if(pct<85){f.style.background='#10b981';l.textContent='Kuat';}else{f.style.background='#06b6d4';l.textContent='⚡ Sangat Kuat';}}
+
+// ===== BASE64 =====
+function b64(type){const inp=document.getElementById('b64-in').value;let o='';try{if(type==='encode')o=btoa(unescape(encodeURIComponent(inp)));else if(type==='decode')o=decodeURIComponent(escape(atob(inp)));else if(type==='url-enc')o=encodeURIComponent(inp);else o=decodeURIComponent(inp);}catch(e){o='⚠ Error: '+e.message;}document.getElementById('b64-out').childNodes[0].textContent=o;}
+
+// ===== JSON =====
+function fmtJson(type){const inp=document.getElementById('json-in').value;const b=document.getElementById('json-out');try{const p=JSON.parse(inp);if(type==='pretty')b.childNodes[0].textContent=JSON.stringify(p,null,2);else if(type==='minify')b.childNodes[0].textContent=JSON.stringify(p);else if(type==='validate')b.childNodes[0].textContent='✅ Valid! Tipe: '+(Array.isArray(p)?'Array':typeof p)+' | Keys: '+(typeof p==='object'?Object.keys(p).length:'N/A');else b.childNodes[0].textContent='Keys:\n'+Object.keys(p).map((k,i)=>(i+1)+'. '+k+' ('+typeof p[k]+')').join('\n');}catch(e){b.childNodes[0].textContent='❌ Invalid: '+e.message;}}
+
+// ===== COLOR =====
+function h2rgb(h){return{r:parseInt(h.slice(1,3),16),g:parseInt(h.slice(3,5),16),b:parseInt(h.slice(5,7),16)};}
+function rgb2h(r,g,b){return'#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');}
+function rgb2hsl(r,g,b){r/=255;g/=255;b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b);let h,s,l=(max+min)/2;if(max===min){h=s=0;}else{const d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;}h/=6;}return{h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)};}
+function setColor(hex){document.getElementById('cpreview').style.background=hex;document.getElementById('cpicker').value=hex;document.getElementById('chex').value=hex;const{r,g,b}=h2rgb(hex);const{h,s,l}=rgb2hsl(r,g,b);document.getElementById('cvhex').textContent=hex;document.getElementById('cvrgb').textContent=`rgb(${r},${g},${b})`;document.getElementById('cvhsl').textContent=`hsl(${h},${s}%,${l}%)`;}
+function fromPicker(){setColor(document.getElementById('cpicker').value);}
+function fromHex(){const h=document.getElementById('chex').value;if(/^#[0-9A-Fa-f]{6}$/.test(h))setColor(h);}
+function randColor(){setColor('#'+[...crypto.getRandomValues(new Uint8Array(3))].map(b=>b.toString(16).padStart(2,'0')).join(''));}
+
+// ===== UNIT =====
+const UD={length:{units:['mm','cm','m','km','inch','feet','yard','mile'],toBase:{'mm':0.001,'cm':0.01,'m':1,'km':1000,'inch':0.0254,'feet':0.3048,'yard':0.9144,'mile':1609.34}},weight:{units:['mg','g','kg','ton','oz','lb'],toBase:{'mg':0.000001,'g':0.001,'kg':1,'ton':1000,'oz':0.0283495,'lb':0.453592}},temp:{units:['Celsius','Fahrenheit','Kelvin'],toBase:null},area:{units:['mm²','cm²','m²','km²','hectare','acre','ft²'],toBase:{'mm²':0.000001,'cm²':0.0001,'m²':1,'km²':1000000,'hectare':10000,'acre':4046.86,'ft²':0.092903}},speed:{units:['m/s','km/h','mph','knot'],toBase:{'m/s':1,'km/h':0.277778,'mph':0.44704,'knot':0.514444}},data:{units:['bit','byte','KB','MB','GB','TB'],toBase:{'bit':0.125,'byte':1,'KB':1024,'MB':1048576,'GB':1073741824,'TB':1099511627776}}};
+function updateUnits(){const cat=document.getElementById('ucat').value;const u=UD[cat].units;document.getElementById('ufrom').innerHTML=u.map(x=>`<option>${x}</option>`).join('');document.getElementById('uto').innerHTML=u.map((x,i)=>`<option${i===1?' selected':''}>${x}</option>`).join('');cvUnit();}
+function cvUnit(){const cat=document.getElementById('ucat').value;const val=parseFloat(document.getElementById('uval').value);const from=document.getElementById('ufrom').value;const to=document.getElementById('uto').value;let res;if(cat==='temp'){let c;if(from==='Celsius')c=val;else if(from==='Fahrenheit')c=(val-32)*5/9;else c=val-273.15;if(to==='Celsius')res=c;else if(to==='Fahrenheit')res=c*9/5+32;else res=c+273.15;}else{const base=val*UD[cat].toBase[from];res=base/UD[cat].toBase[to];}document.getElementById('uout').textContent=isNaN(res)?'—':(parseFloat(res.toFixed(8)))+' '+to;}
+function swapUnit(){const f=document.getElementById('ufrom');const t=document.getElementById('uto');const tmp=f.value;f.value=t.value;t.value=tmp;cvUnit();}
+
+// ===== HASH =====
+function djb2(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h)+s.charCodeAt(i);return(h>>>0).toString(16).padStart(8,'0');}
+function fnv(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*16777619)>>>0;}return h.toString(16).padStart(8,'0');}
+function crc32(s){let t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?0xEDB88320^(c>>>1):c>>>1;t[n]=c;}let c=0xFFFFFFFF;for(let i=0;i<s.length;i++)c=(c>>>8)^t[(c^s.charCodeAt(i))&0xFF];return((c^0xFFFFFFFF)>>>0).toString(16).padStart(8,'0');}
+async function doHash(type){const inp=document.getElementById('hash-in').value;const b=document.getElementById('hash-out');let o='';if(type==='djb2')o='DJB2:    '+djb2(inp);else if(type==='fnv')o='FNV-1a:  '+fnv(inp);else if(type==='crc32')o='CRC32:   '+crc32(inp);else{try{const e=new TextEncoder().encode(inp);const buf=await crypto.subtle.digest('SHA-256',e);o='SHA-256:\n'+Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}catch(e){o='⚠ '+e.message;}}b.childNodes[0].textContent=o;}
+
+// ===== TIME =====
+function updTime(){const n=new Date();document.getElementById('tsn').textContent=Math.floor(n.getTime()/1000);document.getElementById('tsiso').textContent=n.toISOString().slice(0,19);document.getElementById('tswib').textContent=n.toLocaleString('id-ID',{timeZone:'Asia/Jakarta'});}
+setInterval(updTime,1000);updTime();
+function cvTs(){const ts=parseInt(document.getElementById('tsin').value);if(isNaN(ts)){document.getElementById('ts-out').childNodes[0].textContent='⚠ Masukkan angka valid';return;}const d=new Date(ts*1000);const o=['UTC:   '+d.toUTCString(),'ISO:   '+d.toISOString(),'WIB:   '+d.toLocaleString('id-ID',{timeZone:'Asia/Jakarta'}),'WITA:  '+d.toLocaleString('id-ID',{timeZone:'Asia/Makassar'}),'WIT:   '+d.toLocaleString('id-ID',{timeZone:'Asia/Jayapura'})].join('\n');document.getElementById('ts-out').childNodes[0].textContent=o;}
+function cvDiff(){const a=new Date(document.getElementById('dfrom').value);const b=new Date(document.getElementById('dto').value);if(isNaN(a)||isNaN(b)){document.getElementById('diff-out').textContent='⚠ Format: YYYY-MM-DD';return;}const ms=Math.abs(b-a);const days=Math.floor(ms/86400000);document.getElementById('diff-out').textContent=`${days} hari\n${Math.floor(days/7)} minggu\n${Math.floor(days/30.4375)} bulan (~)\n${Math.floor(days/365.25)} tahun (~)`;}
+
+// ===== CALCULATOR =====
+let cMode='std';
+let cS={d:'0',p:null,op:null,new:true,h:''};
+let scS={d:'0',p:null,op:null,new:true,h:''};
+function setCalcMode(m){cMode=m;['std','sci','pct','loan'].forEach(x=>{document.getElementById('calc-'+x).style.display=x===m?'block':'none';document.getElementById('cm-'+x).className='btn '+(x===m?'btn-primary':'btn-secondary');});}
+function updDisp(){const d=document.getElementById('cdisp');const h=document.getElementById('chist');let v=cS.d;if(!isNaN(v)&&!v.includes('.')&&Math.abs(parseFloat(v))<1e15)v=parseFloat(v).toLocaleString('id-ID',{maximumFractionDigits:10});d.textContent=v;h.textContent=cS.h;d.style.fontSize=v.length>14?'1.1rem':v.length>10?'1.6rem':'2rem';}
+function cNum(n){if(cS.new){cS.d=n==='.'?'0.':n;cS.new=false;}else if(n==='.'&&cS.d.includes('.'))return;else cS.d+=n;updDisp();}
+function cOp(op){if(cS.op&&!cS.new)cEq(true);cS.p=parseFloat(cS.d.replace(/[^0-9.-]/g,''));cS.op=op;cS.h=cS.d+' '+{'+':'+','-':'−','*':'×','/':'÷','**':'^'}[op];cS.new=true;updDisp();}
+function cEq(chain=false){if(!cS.op)return;const a=cS.p,b=parseFloat(cS.d.replace(/[^0-9.-]/g,''));let r;switch(cS.op){case'+':r=a+b;break;case'-':r=a-b;break;case'*':r=a*b;break;case'/':r=b===0?'Error:÷0':a/b;break;case'**':r=Math.pow(a,b);}if(!chain)cS.h+=(' '+cS.d+' =');cS.d=typeof r==='string'?r:String(parseFloat(r.toFixed(10)));if(!chain){cS.op=null;cS.p=null;}cS.new=true;updDisp();}
+function cFn(fn){const cur=parseFloat(cS.d.replace(/[^0-9.-]/g,''))||0;if(fn==='AC'){cS={d:'0',p:null,op:null,new:true,h:''};}else if(fn==='+/-'){cS.d=String(-cur);cS.new=false;}else if(fn==='%'){cS.d=String(cur/100);cS.new=false;}else if(fn==='back'){cS.d=cS.d.length>1?cS.d.slice(0,-1):'0';cS.new=false;}updDisp();}
+// Scientific
+function updScDisp(){const d=document.getElementById('scdisp');d.textContent=scS.d;document.getElementById('schist').textContent=scS.h;d.style.fontSize=scS.d.length>14?'1rem':scS.d.length>10?'1.4rem':'1.7rem';}
+function scNum(n){if(scS.new){scS.d=n==='.'?'0.':n;scS.new=false;}else if(n==='.'&&scS.d.includes('.'))return;else scS.d+=n;updScDisp();}
+function scOp(op){if(scS.op&&!scS.new)scEq(true);scS.p=parseFloat(scS.d);scS.op=op;scS.h=scS.d+' '+{'+':'+','-':'−','*':'×','/':'÷','**':'^'}[op];scS.new=true;updScDisp();}
+function scEq(chain=false){if(!scS.op)return;const a=scS.p,b=parseFloat(scS.d);let r;switch(scS.op){case'+':r=a+b;break;case'-':r=a-b;break;case'*':r=a*b;break;case'/':r=b===0?'Error':a/b;break;case'**':r=Math.pow(a,b);}if(!chain)scS.h+=(' '+scS.d+' =');scS.d=typeof r==='string'?r:String(parseFloat(r.toPrecision(12)));if(!chain){scS.op=null;scS.p=null;}scS.new=true;updScDisp();}
+function fact(n){if(n<0)return NaN;if(n<=1)return 1;if(n>170)return Infinity;let r=1;for(let i=2;i<=n;i++)r*=i;return r;}
+function scFn(fn){const cur=parseFloat(scS.d)||0;let r;switch(fn){case'sin':r=Math.sin(cur*Math.PI/180);break;case'cos':r=Math.cos(cur*Math.PI/180);break;case'tan':r=Math.tan(cur*Math.PI/180);break;case'log':r=cur<=0?'Error':Math.log10(cur);break;case'ln':r=cur<=0?'Error':Math.log(cur);break;case'sqrt':r=cur<0?'Error':Math.sqrt(cur);break;case'pow2':r=Math.pow(cur,2);break;case'pow3':r=Math.pow(cur,3);break;case'inv':r=cur===0?'Error':1/cur;break;case'abs':r=Math.abs(cur);break;case'fact':r=fact(Math.round(cur));break;case'pi':scS.d=String(Math.PI);scS.new=true;updScDisp();return;case'e':scS.d=String(Math.E);scS.new=true;updScDisp();return;case'+/-':r=-cur;break;case'%':r=cur/100;break;case'back':scS.d=scS.d.length>1?scS.d.slice(0,-1):'0';scS.new=false;updScDisp();return;case'AC':scS={d:'0',p:null,op:null,new:true,h:''};updScDisp();return;}scS.d=typeof r==='string'?r:String(parseFloat(r.toPrecision(12)));scS.new=true;updScDisp();}
+function calcDisc(){const p=parseFloat(document.getElementById('disc-p').value)||0;const pct=parseFloat(document.getElementById('disc-pct').value)||0;const save=p*pct/100;document.getElementById('disc-out').textContent=`Hemat: Rp ${save.toLocaleString('id-ID')}\nHarga Akhir: Rp ${(p-save).toLocaleString('id-ID')}`;}
+function calcChg(){const f=parseFloat(document.getElementById('chg-f').value)||0;const t=parseFloat(document.getElementById('chg-t').value)||0;if(f===0){document.getElementById('chg-out').textContent='⚠ Nilai awal tidak boleh 0';return;}const pct=((t-f)/Math.abs(f))*100;document.getElementById('chg-out').textContent=`${pct>=0?'📈 Naik':'📉 Turun'} ${Math.abs(pct).toFixed(2)}%\n${f.toLocaleString('id-ID')} → ${t.toLocaleString('id-ID')}`;}
+function calcLoan(){const total=parseFloat(document.getElementById('la').value)||0;const dp=parseFloat(document.getElementById('ldp').value)||0;const ry=parseFloat(document.getElementById('lr').value)||0;const y=parseFloat(document.getElementById('ly').value)||0;const pokok=total-dp;const rm=ry/100/12;const n=y*12;if(!pokok||!n||!ry){document.getElementById('loan-out').textContent='— isi semua kolom —';return;}const cic=pokok*(rm*Math.pow(1+rm,n))/(Math.pow(1+rm,n)-1);const tot=cic*n;const flat=pokok/n+(pokok*ry/100/12);document.getElementById('loan-out').textContent=`━ ANUITAS (Efektif) ━\nCicilan/bulan: Rp ${Math.round(cic).toLocaleString('id-ID')}\nTotal bayar:   Rp ${Math.round(tot).toLocaleString('id-ID')}\nTotal bunga:   Rp ${Math.round(tot-pokok).toLocaleString('id-ID')}\n\n━ FLAT ━\nCicilan/bulan: Rp ${Math.round(flat).toLocaleString('id-ID')}\nTotal bayar:   Rp ${Math.round(flat*n).toLocaleString('id-ID')}\n\nTenor: ${y}th (${n} bulan) | DP: Rp ${dp.toLocaleString('id-ID')}`;}
+document.addEventListener('keydown',e=>{if(cMode==='std'){'0123456789.'.includes(e.key)&&cNum(e.key);e.key==='+'&&cOp('+');e.key==='-'&&cOp('-');e.key==='*'&&cOp('*');e.key==='/'&&(e.preventDefault(),cOp('/'));(e.key==='Enter'||e.key==='=')&&cEq();e.key==='Backspace'&&cFn('back');e.key==='Escape'&&cFn('AC');}});
+
+// ===== TRANSLATE =====
+let trLast='',trTimer=null;
+function trCharCount(){const v=document.getElementById('tr-in').value;document.getElementById('tr-cc').textContent=v.length+' karakter';if(document.getElementById('tr-auto').checked){clearTimeout(trTimer);trTimer=setTimeout(()=>{if(v.trim())doTranslate();},1200);}}
+function swapLang(){const f=document.getElementById('tr-from');const t=document.getElementById('tr-to');const fv=f.value==='auto'?t.value:f.value;const tv=t.value;for(let o of f.options)if(o.value===tv){f.value=tv;break;}for(let o of t.options)if(o.value===fv){t.value=fv;break;}const out=document.getElementById('tr-out').textContent.replace('— hasil terjemahan —','').trim();if(out){document.getElementById('tr-in').value=out;document.getElementById('tr-cc').textContent=out.length+' karakter';}document.getElementById('tr-out').innerHTML='<span style="color:var(--muted);font-size:0.78rem;">— hasil terjemahan —</span>';document.getElementById('tr-det').textContent='';}
+function clearTr(){document.getElementById('tr-in').value='';document.getElementById('tr-cc').textContent='0 karakter';document.getElementById('tr-out').innerHTML='<span style="color:var(--muted);font-size:0.78rem;">— hasil terjemahan —</span>';document.getElementById('tr-det').textContent='';}
+async function doTranslate(){
+  const text=document.getElementById('tr-in').value.trim();
+  if(!text||text===trLast)return;
+  const fl=document.getElementById('tr-from').value;
+  const tl=document.getElementById('tr-to').value;
+  const btn=document.getElementById('tr-btn');
+  const load=document.getElementById('tr-load');
+  const out=document.getElementById('tr-out');
+  btn.disabled=true;btn.textContent='⏳...';load.style.display='block';out.innerHTML='';
+
+  // MyMemory language codes (free API, no key needed)
+  const LC={'Indonesia':'id','Inggris':'en','Jepang':'ja','Korea':'ko','Mandarin':'zh-CN','Arab':'ar','Spanyol':'es','Prancis':'fr','Jerman':'de','Portugis':'pt','Italia':'it','Rusia':'ru','Hindi':'hi','Thailand':'th','Vietnam':'vi','Melayu':'ms','Belanda':'nl','Turki':'tr','Jawa':'jv','Sunda':'su'};
+  const toCode=LC[tl]||'en';
+  const fromCode=fl==='auto'?'':LC[fl]||'id';
+  const rtlL=['Arab'];const cjkL=['Mandarin','Jepang','Korea'];
+
+  try {
+    // Chunk text (MyMemory limit ~500 chars)
+    const chunks=[];let cur='';
+    for(const seg of (text.match(/[^\n]{1,400}\n?/g)||[text])){
+      if((cur+seg).length>450){if(cur)chunks.push(cur.trim());cur=seg;}else cur+=seg;
+    }
+    if(cur.trim())chunks.push(cur.trim());
+
+    const parts=[];
+    for(const chunk of chunks){
+      const pair=fl==='auto'?`autodetect|${toCode}`:`${fromCode}|${toCode}`;
+      const url=`https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=${pair}`;
+      const r=await fetch(url);
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const d=await r.json();
+      if(d.responseStatus===200||d.responseStatus==='200'){
+        parts.push(d.responseData.translatedText);
+        if(chunks.indexOf(chunk)===0&&fl==='auto'&&d.responseData.detectedLanguage){
+          document.getElementById('tr-det').textContent='🔍 Terdeteksi: '+d.responseData.detectedLanguage;
+        }
+      } else {
+        throw new Error(d.responseDetails||'Terjemahan gagal ('+d.responseStatus+')');
+      }
+    }
+
+    const res=parts.join(' ');
+    out.setAttribute('data-rtl',rtlL.includes(tl)?'true':'false');
+    out.style.direction=rtlL.includes(tl)?'rtl':'ltr';
+    out.style.textAlign=rtlL.includes(tl)?'right':'left';
+    out.textContent=res;
+    trLast=text;
+
+  } catch(e){
+    out.innerHTML=`<span style="color:var(--danger)">⚠ ${e.message}</span><br><span style="color:var(--muted);font-size:0.78rem;">Pastikan internet aktif. MyMemory gratis ~5000 kata/hari.</span>`;
+  } finally {
+    btn.disabled=false;btn.textContent='🌐 Terjemahkan';load.style.display='none';
+  }
+}
+function cpTranslate(){const t=document.getElementById('tr-out').textContent.replace('— hasil terjemahan —','').trim();if(!t)return;navigator.clipboard.writeText(t).then(()=>{const b=document.getElementById('tr-cp');b.textContent='✓ Copied!';setTimeout(()=>b.textContent='Copy',2000);});}
+function quickTr(p){document.getElementById('tr-in').value=p;document.getElementById('tr-cc').textContent=p.length+' karakter';doTranslate();}
+
+// ===== QR CODE =====
+let qrTimer=null;
+function qrLive(){clearTimeout(qrTimer);qrTimer=setTimeout(()=>{if(document.getElementById('qr-in').value.trim())genQR();},600);}
+function genQR(){const text=document.getElementById('qr-in').value.trim();if(!text)return;const size=parseInt(document.getElementById('qr-size').value);const ec=document.getElementById('qr-ec').value;const canvas=document.getElementById('qr-canvas');const ph=document.getElementById('qr-ph');canvas.width=size;canvas.height=size;const url=`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&ecc=${ec}&format=png`;const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);ctx.drawImage(img,0,0,size,size);canvas.style.display='block';ph.style.display='none';};img.onerror=()=>{ph.textContent='⚠ Gagal. Cek koneksi internet.';};img.src=url;}
+function dlQR(){const c=document.getElementById('qr-canvas');if(c.style.display==='none'){genQR();return;}const a=document.createElement('a');a.download='qrcode.png';a.href=c.toDataURL('image/png');a.click();}
+
+// ===== RANDOM =====
+function rUUID(){const u=([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));document.getElementById('r-uuid').textContent=u;}
+function rNum(){const mn=parseInt(document.getElementById('r-min').value);const mx=parseInt(document.getElementById('r-max').value);const a=new Uint32Array(1);crypto.getRandomValues(a);const n=mn+(a[0]%(mx-mn+1));const el=document.getElementById('r-num');el.style.transform='scale(1.3)';el.textContent=n;setTimeout(()=>el.style.transform='',200);}
+function rColor(){const h='#'+[...crypto.getRandomValues(new Uint8Array(3))].map(b=>b.toString(16).padStart(2,'0')).join('');document.getElementById('r-cbox').style.background=h;document.getElementById('r-cval').textContent=h;}
+function rCoin(){const el=document.getElementById('r-coin');const lbl=document.getElementById('r-coinlbl');el.style.transform='rotateY(720deg)';setTimeout(()=>{const r=Math.random()<0.5;el.textContent=r?'🪙':'💿';lbl.textContent=r?'HEADS (Angka)':'TAILS (Gambar)';lbl.style.color=r?'var(--accent3)':'var(--accent2)';el.style.transform='';},300);}
+function rDice(){const s=parseInt(document.getElementById('r-dice').value);const faces=['','⚀','⚁','⚂','⚃','⚄','⚅'];const a=new Uint32Array(1);crypto.getRandomValues(a);const r=(a[0]%s)+1;const el=document.getElementById('r-dres');el.style.transform='rotate(360deg)';setTimeout(()=>{el.textContent=s===6&&r<=6?faces[r]:r;el.style.transform='';},200);}
+const NAMES={id:{f:['Adam','Budi','Citra','Dewi','Eko','Farah','Gilang','Hana','Irfan','Joko','Kiki','Lina','Mika','Nadia','Reza','Sari','Tono','Wahyu','Yusuf','Zahra'],l:['Santoso','Wijaya','Kusuma','Pratama','Saputra','Hidayat','Nugroho','Purnama','Suharto','Rahayu']},en:{f:['James','Emily','William','Sophia','Oliver','Ava','Noah','Mia','Liam','Charlotte','Lucas','Amelia'],l:['Smith','Johnson','Williams','Jones','Brown','Davis','Miller','Wilson','Moore','Taylor']},jp:{f:['Haruto','Sakura','Riku','Yui','Sota','Hina','Yuto','Mio','Hayato','Aoi'],l:['Sato','Suzuki','Tanaka','Watanabe','Ito','Yamamoto','Nakamura','Kobayashi']}};
+function rName(){const t=document.getElementById('r-ntype').value;const n=NAMES[t];const a=crypto.getRandomValues(new Uint32Array(2));const f=n.f[a[0]%n.f.length];const l=n.l[a[1]%n.l.length];document.getElementById('r-name').textContent=t==='jp'?l+' '+f:f+' '+l;}
+function rPick(count){const items=document.getElementById('r-list').value.split('\n').filter(l=>l.trim());if(!items.length)return;const shuffled=[...items].sort(()=>Math.random()-0.5);const picks=shuffled.slice(0,Math.min(count,items.length));document.getElementById('r-pick').textContent=(count===1?'🎯 '+picks[0].trim():picks.map((p,i)=>(i+1)+'. '+p.trim()).join('\n'));}
+
+// ===== MARKDOWN =====
+function renderMd(){const inp=document.getElementById('md-in').value;const prev=document.getElementById('md-prev');let h=inp.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/```([\s\S]*?)```/g,'<pre><code>$1</code></pre>').replace(/^###### (.+)$/gm,'<h6>$1</h6>').replace(/^##### (.+)$/gm,'<h5>$1</h5>').replace(/^#### (.+)$/gm,'<h4>$1</h4>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h2>$1</h2>').replace(/^# (.+)$/gm,'<h1>$1</h1>').replace(/\*\*\*(.+?)\*\*\*/g,'<strong><em>$1</em></strong>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>').replace(/^---$/gm,'<hr>').replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" target="_blank">$1</a>').replace(/!\[(.+?)\]\((.+?)\)/g,'<img src="$2" alt="$1" style="max-width:100%;border-radius:6px;">').replace(/^- \[x\] (.+)$/gm,'<div style="display:flex;gap:8px;"><input type="checkbox" checked disabled><span style="text-decoration:line-through;opacity:0.6">$1</span></div>').replace(/^- \[ \] (.+)$/gm,'<div style="display:flex;gap:8px;"><input type="checkbox" disabled>$1</div>').replace(/^[-*+] (.+)$/gm,'<li>$1</li>').replace(/^\d+\. (.+)$/gm,'<li style="list-style:decimal;margin-left:20px;">$1</li>').replace(/~~(.+?)~~/g,'<del>$1</del>').replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');prev.innerHTML='<p>'+h+'</p>';}
+function mdIns(t){const ta=document.getElementById('md-in');const s=ta.selectionStart;ta.value=ta.value.substring(0,s)+t+ta.value.substring(ta.selectionEnd);ta.focus();ta.selectionStart=ta.selectionEnd=s+t.length;renderMd();}
+function mdSample(){document.getElementById('md-in').value=`# ⚡ Toolbox oleh Adam yang Ganteng\n\nToolbox ini dibuat dengan **penuh semangat** dan *sedikit bantuan* dari Winda.\n\n## Fitur Tersedia\n\n- 📝 Text Analyzer\n- 🔐 Password Generator\n- 🌐 AI Translator\n- 🧮 Kalkulator lengkap\n\n## Kode Contoh\n\n\`\`\`\nconst creator = "Adam yang ganteng";\nconsole.log("Dibuat oleh:", creator);\n\`\`\`\n\n> Semua tools 100% gratis dan berjalan di browser!\n\n---\n\n### To Do\n\n- [x] Buat toolbox keren\n- [x] Tambahkan AI translate\n- [ ] Ajarin Winda ~~yang jelek~~ 😄`;renderMd();}
+
+// ===== REGEX =====
+function testRx(){const pat=document.getElementById('rx-pat').value;const flags=document.getElementById('rx-flags').value;const inp=document.getElementById('rx-in').value;const out=document.getElementById('rx-out');const stat=document.getElementById('rx-stat');if(!pat){out.innerHTML=inp||'—';stat.textContent='';return;}try{const rx=new RegExp(pat,flags);const matches=[...inp.matchAll(new RegExp(pat,flags.includes('g')?flags:flags+'g'))];out.innerHTML=inp.replace(rx,m=>`<mark>${m.replace(/</g,'&lt;')}</mark>`)||'—';stat.textContent=`✅ Valid — ${matches.length} match`;stat.style.color='var(--success)';}catch(e){out.innerHTML=inp||'—';stat.textContent='❌ Error: '+e.message;stat.style.color='var(--danger)';}}
+function rxPreset(name,pat,flags,sample){document.getElementById('rx-pat').value=pat;document.getElementById('rx-flags').value=flags;if(!document.getElementById('rx-in').value)document.getElementById('rx-in').value=sample;testRx();}
+
+// ===== STOPWATCH =====
+let swInt=null,swRun=false,swMs=0,swLapN=0;
+function swToggle(){if(swRun){clearInterval(swInt);swRun=false;document.getElementById('sw-btn').textContent='▶ Lanjut';}else{const start=Date.now()-swMs;swInt=setInterval(()=>{swMs=Date.now()-start;const m=swMs;const h=Math.floor(m/3600000).toString().padStart(2,'0');const mn=Math.floor((m%3600000)/60000).toString().padStart(2,'0');const s=Math.floor((m%60000)/1000).toString().padStart(2,'0');const ms=Math.floor(m%1000).toString().padStart(3,'0');document.getElementById('sw-d').textContent=`${h}:${mn}:${s}.${ms}`;},10);swRun=true;document.getElementById('sw-btn').textContent='⏸ Pause';}}
+function swReset(){clearInterval(swInt);swRun=false;swMs=0;swLapN=0;document.getElementById('sw-d').textContent='00:00:00.000';document.getElementById('sw-btn').textContent='▶ Start';document.getElementById('sw-laps').innerHTML='';}
+function swLap(){if(!swRun&&swMs===0)return;swLapN++;const d=document.getElementById('sw-d').textContent;const laps=document.getElementById('sw-laps');const div=document.createElement('div');div.style.cssText='padding:3px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;';div.innerHTML=`<span style="color:var(--muted)">Lap ${swLapN}</span><span style="color:var(--accent2)">${d}</span>`;laps.insertBefore(div,laps.firstChild);}
+
+// ===== COUNTDOWN =====
+let cdInt=null,cdRun=false,cdRem=0;
+function cdToggle(){if(cdRun){clearInterval(cdInt);cdRun=false;document.getElementById('cd-btn').textContent='▶ Lanjut';}else{if(cdRem===0){const h=parseInt(document.getElementById('cd-h').value)||0;const m=parseInt(document.getElementById('cd-m').value)||0;const s=parseInt(document.getElementById('cd-s').value)||0;cdRem=h*3600+m*60+s;}if(cdRem<=0)return;const end=Date.now()+cdRem*1000;cdInt=setInterval(()=>{cdRem=Math.max(0,Math.round((end-Date.now())/1000));const h=Math.floor(cdRem/3600);const m=Math.floor((cdRem%3600)/60);const s=cdRem%60;document.getElementById('cd-d').textContent=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;if(cdRem===0){clearInterval(cdInt);cdRun=false;document.getElementById('cd-btn').textContent='▶ Start';document.getElementById('cd-d').style.color='var(--danger)';showNotif('⏰ Waktu Habis!');}},250);cdRun=true;document.getElementById('cd-btn').textContent='⏸ Pause';document.getElementById('cd-d').style.color='var(--accent3)';}}
+function cdReset(){clearInterval(cdInt);cdRun=false;cdRem=0;document.getElementById('cd-btn').textContent='▶ Start';document.getElementById('cd-d').style.color='var(--accent3)';const h=parseInt(document.getElementById('cd-h').value)||0;const m=parseInt(document.getElementById('cd-m').value)||0;const s=parseInt(document.getElementById('cd-s').value)||0;cdRem=h*3600+m*60+s;const hh=Math.floor(cdRem/3600);const mm=Math.floor((cdRem%3600)/60);const ss=cdRem%60;document.getElementById('cd-d').textContent=`${hh.toString().padStart(2,'0')}:${mm.toString().padStart(2,'0')}:${ss.toString().padStart(2,'0')}`;}
+function cdPreset(m,h=0,s=0){clearInterval(cdInt);cdRun=false;cdRem=0;document.getElementById('cd-h').value=h;document.getElementById('cd-m').value=m;document.getElementById('cd-s').value=s;document.getElementById('cd-btn').textContent='▶ Start';document.getElementById('cd-d').style.color='var(--accent3)';cdRem=h*3600+m*60+s;const hh=Math.floor(cdRem/3600);const mm2=Math.floor((cdRem%3600)/60);const ss=cdRem%60;document.getElementById('cd-d').textContent=`${hh.toString().padStart(2,'0')}:${mm2.toString().padStart(2,'0')}:${ss.toString().padStart(2,'0')}`;}
+
+// ===== CSV TABLE =====
+function renderCsv(){const raw=document.getElementById('csv-in').value;const sep=document.getElementById('csv-sep').value;const hdr=document.getElementById('csv-hdr').checked;const wrap=document.getElementById('csv-wrap');if(!raw.trim()){wrap.innerHTML='';document.getElementById('csv-stat').textContent='';return;}const rows=raw.trim().split('\n').map(r=>r.split(sep));let html='<table>';let ds=0;if(hdr&&rows.length>0){html+='<thead><tr>'+rows[0].map(h=>`<th>${h.trim()}</th>`).join('')+'</tr></thead>';ds=1;}html+='<tbody>';for(let i=ds;i<rows.length;i++){const odd=(i-ds)%2===0;html+=`<tr style="background:${odd?'var(--bg)':'var(--surface)'};">`+rows[i].map(c=>`<td>${c.trim()}</td>`).join('')+'</tr>';}html+='</tbody></table>';wrap.innerHTML=html;document.getElementById('csv-stat').textContent=`${rows.length-ds} baris × ${rows[0].length} kolom`;}
+function csvSample(){document.getElementById('csv-in').value=`Nama,Umur,Kota,Pekerjaan\nAdam,25,Jakarta,Developer\nWinda,22,Bandung,Designer\nBudi,30,Surabaya,Manager\nSari,28,Yogyakarta,Analyst`;renderCsv();}
+function csvExport(fmt){const raw=document.getElementById('csv-in').value;const sep=document.getElementById('csv-sep').value;const rows=raw.trim().split('\n').map(r=>r.split(sep));if(!rows.length)return;let out='';if(fmt==='markdown'){out='| '+rows[0].map(h=>h.trim()).join(' | ')+' |\n';out+='| '+rows[0].map(()=>'---').join(' | ')+' |\n';for(let i=1;i<rows.length;i++)out+='| '+rows[i].map(c=>c.trim()).join(' | ')+' |\n';}else{out='<table>\n<thead><tr>'+rows[0].map(h=>`<th>${h.trim()}</th>`).join('')+'</tr></thead>\n<tbody>\n';for(let i=1;i<rows.length;i++)out+='<tr>'+rows[i].map(c=>`<td>${c.trim()}</td>`).join('')+'</tr>\n';out+='</tbody>\n</table>';}navigator.clipboard.writeText(out).then(()=>showNotif('✓ '+fmt.toUpperCase()+' disalin!'));}
+
+// ===== GRADIENT =====
+const GR_PRESETS=[['#667eea','#764ba2'],['#f093fb','#f5576c'],['#4facfe','#00f2fe'],['#43e97b','#38f9d7'],['#fa709a','#fee140'],['#30cfd0','#330867'],['#a18cd1','#fbc2eb'],['#fd7043','#ff8a65'],['#00b09b','#96c93d'],['#a1c4fd','#c2e9fb'],['#7c3aed','#06b6d4'],['#f59e0b','#ef4444']];
+function renderGr(){const type=document.getElementById('gr-type').value;const dir=document.getElementById('gr-dir').value;const c1=document.getElementById('gr-c1').value;const c2=document.getElementById('gr-c2').value;const c3=document.getElementById('gr-c3').value;const use3=document.getElementById('gr-c3on').checked;document.getElementById('gr-c1t').value=c1;document.getElementById('gr-c2t').value=c2;document.getElementById('gr-c3t').value=c3;const stops=use3?`${c1}, ${c2}, ${c3}`:`${c1}, ${c2}`;let css;if(type==='linear')css=`linear-gradient(${dir}, ${stops})`;else if(type==='radial')css=`radial-gradient(circle, ${stops})`;else css=`conic-gradient(${stops})`;document.getElementById('gr-prev').style.background=css;document.getElementById('gr-css').value=`background: ${css};`;}
+function syncGr(n){const t=document.getElementById('gr-c'+n+'t').value;if(/^#[0-9A-Fa-f]{6}$/.test(t)){document.getElementById('gr-c'+n).value=t;renderGr();}}
+function randGr(){const a=crypto.getRandomValues(new Uint32Array(1));const p=GR_PRESETS[a[0]%GR_PRESETS.length];document.getElementById('gr-c1').value=p[0];document.getElementById('gr-c2').value=p[1];renderGr();}
+function initGrPresets(){const c=document.getElementById('gr-presets');GR_PRESETS.forEach(([c1,c2])=>{const d=document.createElement('div');d.className='gr-preset';d.style.background=`linear-gradient(135deg,${c1},${c2})`;d.onclick=()=>{document.getElementById('gr-c1').value=c1;document.getElementById('gr-c2').value=c2;document.getElementById('gr-c3on').checked=false;renderGr();};c.appendChild(d);});}
+
+// ===== MINIFIER =====
+let miniMode='css';
+function setMini(m){miniMode=m;document.getElementById('mini-css').className='btn '+(m==='css'?'btn-primary':'btn-secondary');document.getElementById('mini-js').className='btn '+(m==='js'?'btn-primary':'btn-secondary');}
+function doMinify(){const inp=document.getElementById('mini-in').value;if(!inp.trim())return;let o;if(miniMode==='css'){o=inp.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\s*([{}:;,>~+])\s*/g,'$1').replace(/\s+/g,' ').replace(/;\}/g,'}').trim();}else{o=inp.replace(/\/\/[^\n]*/g,'').replace(/\/\*[\s\S]*?\*\//g,'').replace(/\n\s*/g,' ').replace(/\s{2,}/g,' ').replace(/\s*([=+\-*/%&|^!<>?:;,{}()[\]])\s*/g,'$1').trim();}const ratio=((1-o.length/inp.length)*100).toFixed(1);document.getElementById('mini-out').childNodes[0].textContent=o;document.getElementById('mini-stat').innerHTML=`<div class="stat-chip">Asli: <span>${inp.length}</span></div><div class="stat-chip">Hasil: <span>${o.length}</span></div><div class="stat-chip">Hemat: <span>${ratio}%</span></div>`;}
+function doBeautify(){const inp=document.getElementById('mini-in').value;let o;if(miniMode==='css'){o=inp.replace(/\s*{\s*/g,' {\n  ').replace(/;\s*/g,';\n  ').replace(/\s*}\s*/g,'\n}\n').trim();}else{o=inp.replace(/;/g,';\n').replace(/\{/g,' {\n  ').replace(/\}/g,'\n}\n').replace(/\n\s*\n/g,'\n').trim();}document.getElementById('mini-out').childNodes[0].textContent=o;document.getElementById('mini-stat').innerHTML='';}
+function miniSample(){document.getElementById('mini-in').value=miniMode==='css'?`.btn {\n  background: #7c3aed;\n  color: white;\n  padding: 10px 20px;\n  border-radius: 8px;\n  /* Main button style */\n  font-size: 1rem;\n  transition: all 0.2s ease;\n}\n\n.btn:hover {\n  opacity: 0.9;\n  transform: translateY(-1px);\n}`:`// Fungsi greeting\nfunction greet(name) {\n  const msg = "Halo, " + name + "!";\n  console.log(msg);\n  return msg;\n}\n\n// Hitung total\nfunction total(items) {\n  let sum = 0;\n  for (let i = 0; i < items.length; i++) {\n    sum += items[i].price;\n  }\n  return sum;\n}`;}
+
+// ===== INIT =====
+updateUnits();
+setColor('#7c3aed');
+renderGr();
+initGrPresets();
+</script>
+</body>
+</html>
